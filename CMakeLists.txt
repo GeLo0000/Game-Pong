@@ -19,11 +19,13 @@ FetchContent_MakeAvailable(sfml)
 set(SOURCES
     src/main.cpp
     src/game.cpp
+    src/input_handler.cpp
     src/window.cpp
 )
 
 set(HEADERS
     include/game.h
+    include/input_handler.h
     include/window.h
 )
 

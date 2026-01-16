@@ -14,6 +14,7 @@ void Game::run()
     while (m_window.isOpen())
     {
         processEvents();
+        m_input.update(m_inputState);
         update();
         render();
     }
@@ -33,7 +34,33 @@ void Game::processEvents()
 
 void Game::update()
 {
-    // Game logic will go here (movement, collisions, AI)
+    if (m_inputState.quit)
+    {
+        m_window.close();
+    }
+
+    // Test ball movement with input
+    const float speed = 5.0f;
+    sf::Vector2f position = m_ball.getPosition();
+
+    if (m_inputState.moveUp)
+    {
+        position.y -= speed;
+    }
+    if (m_inputState.moveDown)
+    {
+        position.y += speed;
+    }
+    if (m_inputState.moveLeft)
+    {
+        position.x -= speed;
+    }
+    if (m_inputState.moveRight)
+    {
+        position.x += speed;
+    }
+
+    m_ball.setPosition(position);
 }
 
 void Game::render()
