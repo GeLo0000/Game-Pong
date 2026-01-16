@@ -1,90 +1,50 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.28)
+project(Game-Pong LANGUAGES CXX)
 
-project(Game-Pong)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# === C++ Standard ===
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# === SFML Configuration ===
-include(FetchContent)
-FetchContent_Declare(
-    sfml
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 2.6.1
-)
-FetchContent_MakeAvailable(sfml)
-
-# === Source Files ===
 set(SOURCES
     src/main.cpp
-    src/game.cpp
-    src/input_handler.cpp
-    src/paddle.cpp
-    src/window.cpp
 )
 
 set(HEADERS
-    include/game.h
-    include/input_handler.h
-    include/paddle.h
-    include/window.h
+    
 )
 
-# === Create Executable ===
+include(FetchContent)
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 3.0.2
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+    SYSTEM)
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(SFML_BUILD_AUDIO ON CACHE BOOL "" FORCE)
+set(SFML_BUILD_GRAPHICS ON CACHE BOOL "" FORCE)
+set(SFML_BUILD_WINDOW ON CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(SFML)
+
 add_executable(Game-Pong ${SOURCES})
 
-# === Include Directories ===
 target_include_directories(Game-Pong PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-# === Link Libraries ===
+target_compile_features(Game-Pong PRIVATE cxx_std_17)
 target_link_libraries(Game-Pong PRIVATE 
-    sfml-graphics 
-    sfml-window 
-    sfml-system
-    sfml-audio
+    SFML::Graphics 
+    SFML::Audio
+    SFML::System
+    SFML::Window
 )
 
-# === Copy Assets to Build Directory ===
 add_custom_command(TARGET Game-Pong POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/assets
-    $<TARGET_FILE_DIR:Game-Pong>/assets
-    COMMENT "Copying assets to build directory"
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
+    COMMENT "Copying assets to bin directory"
 )
 
-# === Windows: Copy DLLs ===
-if(WIN32)
-    add_custom_command(TARGET Game-Pong POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<TARGET_FILE:sfml-graphics>
-        $<TARGET_FILE:sfml-window>
-        $<TARGET_FILE:sfml-system>
-        $<TARGET_FILE:sfml-audio>
-        $<TARGET_FILE_DIR:Game-Pong>
-        COMMENT "Copying SFML DLLs"
-    )
-endif()
-
-# === Linux/macOS: Set RPATH for Shared Libraries ===
-if(UNIX AND NOT APPLE)
-    set_target_properties(Game-Pong PROPERTIES
-        BUILD_RPATH "$ORIGIN/../lib:$ORIGIN/../external/lib"
-        INSTALL_RPATH "$ORIGIN/../lib:$ORIGIN/../external/lib"
-    )
-endif()
-
-# === Install Target ===
-install(TARGETS Game-Pong RUNTIME DESTINATION .)
-install(DIRECTORY assets DESTINATION .)
-
-if(WIN32)
-    install(
-        FILES
-        $<TARGET_FILE:sfml-graphics>
-        $<TARGET_FILE:sfml-window>
-        $<TARGET_FILE:sfml-system>
-        $<TARGET_FILE:sfml-audio>
-        DESTINATION .
-    )
+# VS_STARTUP_PROJECT works only with Visual Studio generators
+if(MSVC)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Game-Pong)
 endif()
