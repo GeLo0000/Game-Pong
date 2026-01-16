@@ -3,6 +3,7 @@
 
 #include "window.h"
 #include "input_handler.h"
+#include "paddle.h"
 #include <SFML/Graphics.hpp>
 
 // Core game class that owns the main loop
@@ -20,9 +21,9 @@ private:
     void render();
 
     Window m_window;
-    sf::CircleShape m_ball; // temporary placeholder for rendering
     InputHandler m_input;
     InputState m_inputState;
+    Paddle m_playerPaddle;
 };
 
 #endif // GAME_H

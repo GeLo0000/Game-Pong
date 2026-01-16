@@ -1,12 +1,9 @@
 #include "game.h"
 
 Game::Game(unsigned int width, unsigned int height)
-    : m_window(width, height, "Pong Game")
+    : m_window(width, height, "Pong Game"),
+      m_playerPaddle(30.0f, (height / 2.0f) - 50.0f)
 {
-    // Temporary drawable to verify rendering
-    m_ball.setRadius(20.f);
-    m_ball.setFillColor(sf::Color::Green);
-    m_ball.setPosition((width / 2.f) - m_ball.getRadius(), (height / 2.f) - m_ball.getRadius());
 }
 
 void Game::run()
@@ -39,33 +36,22 @@ void Game::update()
         m_window.close();
     }
 
-    // Test ball movement with input
-    const float speed = 5.0f;
-    sf::Vector2f position = m_ball.getPosition();
-
+    // Player paddle movement
+    const float paddleSpeed = 6.0f;
+    
     if (m_inputState.moveUp)
     {
-        position.y -= speed;
+        m_playerPaddle.moveUp(paddleSpeed, 0.0f);
     }
     if (m_inputState.moveDown)
     {
-        position.y += speed;
+        m_playerPaddle.moveDown(paddleSpeed, static_cast<float>(m_window.getHeight()));
     }
-    if (m_inputState.moveLeft)
-    {
-        position.x -= speed;
-    }
-    if (m_inputState.moveRight)
-    {
-        position.x += speed;
-    }
-
-    m_ball.setPosition(position);
 }
 
 void Game::render()
 {
     m_window.clear();
-    m_window.draw(m_ball);
+    m_playerPaddle.draw(*m_window.getRenderWindow());
     m_window.display();
 }

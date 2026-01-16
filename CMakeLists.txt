@@ -20,12 +20,14 @@ set(SOURCES
     src/main.cpp
     src/game.cpp
     src/input_handler.cpp
+    src/paddle.cpp
     src/window.cpp
 )
 
 set(HEADERS
     include/game.h
     include/input_handler.h
+    include/paddle.h
     include/window.h
 )
 
