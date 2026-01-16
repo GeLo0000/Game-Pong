@@ -7,8 +7,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # === SFML Configuration ===
-
-
 include(FetchContent)
 FetchContent_Declare(
     sfml
@@ -20,10 +18,12 @@ FetchContent_MakeAvailable(sfml)
 # === Source Files ===
 set(SOURCES
     src/main.cpp
+    src/game.cpp
     src/window.cpp
 )
 
 set(HEADERS
+    include/game.h
     include/window.h
 )
 

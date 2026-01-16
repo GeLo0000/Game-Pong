@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <string>
 
 // Wrapper class for SFML RenderWindow
 class Window
