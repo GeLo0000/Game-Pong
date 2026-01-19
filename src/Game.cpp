@@ -9,7 +9,8 @@ Game::Game()
     : m_windowWidth(800.0f), m_windowHeight(600.0f),
       m_window(sf::VideoMode({static_cast<unsigned int>(m_windowWidth),
                               static_cast<unsigned int>(m_windowHeight)}),
-               "Pong Game") {
+               "Pong Game"),
+      m_currentState(GameState::PLAYING) {
     m_window.setFramerateLimit(144);
 
     // Subscribe to events for quick console verification
@@ -44,6 +45,7 @@ Game::Game()
 
     // Load font and setup score display
     // Try to load from common system font paths
+    // TODO add font file to assets and load from there
     const char *fontPaths[] = {
         "assets/arial.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
         "/usr/share/fonts/TTF/DejaVuSans.ttf"};
@@ -67,6 +69,14 @@ Game::Game()
 
     // Initialize ScoreManager
     ScoreManager::instance();
+
+    // Pause overlay text
+    m_pausedText = sf::Text(m_font);
+    m_pausedText->setString("PAUSED");
+    m_pausedText->setCharacterSize(40);
+    m_pausedText->setFillColor(sf::Color::White);
+    m_pausedText->setPosition(
+        {m_windowWidth / 2.0f - 80.0f, m_windowHeight / 2.0f - 20.0f});
 }
 
 Game::~Game() = default;
@@ -89,6 +99,13 @@ void Game::processEvents() {
         } else if (const auto *kp = ev->getIf<sf::Event::KeyPressed>()) {
             if (kp->scancode == sf::Keyboard::Scancode::Escape) {
                 m_window.close();
+            } else if (kp->scancode == sf::Keyboard::Scancode::Space) {
+                // Toggle pause state
+                if (m_currentState == GameState::PLAYING) {
+                    m_currentState = GameState::PAUSED;
+                } else {
+                    m_currentState = GameState::PLAYING;
+                }
             }
         }
     }
@@ -96,6 +113,11 @@ void Game::processEvents() {
 
 // Update game logic
 void Game::update(float deltaTime) {
+    // Skip updates while paused
+    if (m_currentState == GameState::PAUSED) {
+        return;
+    }
+
     // Handle continuous input for left paddle (W/S)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W)) {
         m_leftPaddle->moveUp();
@@ -144,6 +166,11 @@ void Game::render() {
         m_scoreText->setString(std::to_string(leftScore) + "   " +
                                std::to_string(rightScore));
         m_window.draw(*m_scoreText);
+    }
+
+    // Draw pause text if paused
+    if (m_currentState == GameState::PAUSED && m_pausedText) {
+        m_window.draw(*m_pausedText);
     }
 
     m_window.display();

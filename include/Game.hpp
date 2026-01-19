@@ -6,6 +6,9 @@
 #include <memory>
 #include <optional>
 
+// Game state enum
+enum class GameState { PLAYING, PAUSED };
+
 // Main game controller class
 class Game {
   public:
@@ -35,4 +38,8 @@ class Game {
     // Score display
     sf::Font m_font;
     std::optional<sf::Text> m_scoreText;
+    std::optional<sf::Text> m_pausedText;
+
+    // Game state
+    GameState m_currentState;
 };
