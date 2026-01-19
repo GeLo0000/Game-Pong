@@ -6,7 +6,7 @@
 // Player paddle
 class Paddle : public IGameObject {
   public:
-    Paddle(float x, float y, float width, float height);
+    Paddle(float x, float y, float width, float height, float windowHeight);
 
     void update(float deltaTime) override;
     void draw(sf::RenderTarget &target) override;
@@ -19,5 +19,6 @@ class Paddle : public IGameObject {
   private:
     sf::RectangleShape m_shape;
     float m_moveSpeed;
-    float m_velocityY; // Current vertical velocity
+    float m_velocityY;    // Current vertical velocity
+    float m_windowHeight; // Screen height for clamping
 };

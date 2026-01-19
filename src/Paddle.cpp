@@ -1,10 +1,10 @@
 #include "Paddle.hpp"
 
 // Initialize paddle with position and size
-Paddle::Paddle(float x, float y, float width, float height)
-    : m_moveSpeed(400.0f), m_velocityY(0.0f) {
+Paddle::Paddle(float x, float y, float width, float height, float windowHeight)
+    : m_moveSpeed(400.0f), m_velocityY(0.0f), m_windowHeight(windowHeight) {
     m_shape.setSize({width, height});
-    m_shape.setPosition({x, y});
+    m_shape.setPosition({x, y - height / 2.0f});
     m_shape.setFillColor(sf::Color::White);
 }
 
@@ -16,8 +16,8 @@ void Paddle::update(float deltaTime) {
     // Clamp paddle within screen bounds
     if (pos.y < 0.0f) {
         pos.y = 0.0f;
-    } else if (pos.y + m_shape.getSize().y > 600.0f) {
-        pos.y = 600.0f - m_shape.getSize().y;
+    } else if (pos.y + m_shape.getSize().y > m_windowHeight) {
+        pos.y = m_windowHeight - m_shape.getSize().y;
     }
 
     m_shape.setPosition(pos);

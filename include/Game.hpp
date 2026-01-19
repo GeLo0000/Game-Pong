@@ -27,5 +27,6 @@ class Game {
 
     // Game objects
     std::unique_ptr<Paddle> m_leftPaddle;
+    std::unique_ptr<Paddle> m_rightPaddle;
     std::unique_ptr<Ball> m_ball;
 };

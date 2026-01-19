@@ -6,7 +6,7 @@
 // Game ball that bounces between paddles
 class Ball : public IGameObject {
   public:
-    Ball(float x, float y, float radius);
+    Ball(float x, float y, float radius, float windowWidth, float windowHeight);
 
     void update(float deltaTime) override;
     void draw(sf::RenderTarget &target) override;
@@ -18,4 +18,6 @@ class Ball : public IGameObject {
   private:
     sf::CircleShape m_shape;
     sf::Vector2f m_velocity;
+    float m_windowWidth;
+    float m_windowHeight;
 };
