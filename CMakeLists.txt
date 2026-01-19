@@ -6,10 +6,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(SOURCES
     src/main.cpp
     src/Game.cpp
+    src/Paddle.cpp
+    src/Ball.cpp
 )
 
 set(HEADERS
     include/Game.hpp
+    include/IGameObject.hpp
+    include/Paddle.hpp
+    include/Ball.hpp
 )
 
 include(FetchContent)
