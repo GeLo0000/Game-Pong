@@ -1,5 +1,6 @@
 #include "Game.hpp"
 #include "EventManager.hpp"
+#include "GameMode.hpp"
 #include "ScoreManager.hpp"
 #include <iostream>
 #include <string>
@@ -10,7 +11,7 @@ Game::Game()
       m_window(sf::VideoMode({static_cast<unsigned int>(m_windowWidth),
                               static_cast<unsigned int>(m_windowHeight)}),
                "Pong Game"),
-      m_currentState(GameState::PLAYING) {
+      m_currentState(GameState::MENU) {
     m_window.setFramerateLimit(144);
 
     // Subscribe to events for quick console verification
@@ -77,6 +78,14 @@ Game::Game()
     m_pausedText->setFillColor(sf::Color::White);
     m_pausedText->setPosition(
         {m_windowWidth / 2.0f - 80.0f, m_windowHeight / 2.0f - 20.0f});
+
+    // Menu text
+    m_menuText = sf::Text(m_font);
+    m_menuText->setString(
+        "PONG\n\n1 - PvP (W/S vs Up/Down)\n2 - PvAI (W/S vs AI)\nESC - Quit");
+    m_menuText->setCharacterSize(26);
+    m_menuText->setFillColor(sf::Color::White);
+    m_menuText->setPosition({80.0f, 120.0f});
 }
 
 Game::~Game() = default;
@@ -99,12 +108,38 @@ void Game::processEvents() {
         } else if (const auto *kp = ev->getIf<sf::Event::KeyPressed>()) {
             if (kp->scancode == sf::Keyboard::Scancode::Escape) {
                 m_window.close();
-            } else if (kp->scancode == sf::Keyboard::Scancode::Space) {
-                // Toggle pause state
+                continue;
+            }
+
+            // Menu selection
+            if (m_currentState == GameState::MENU) {
+                if (kp->scancode == sf::Keyboard::Scancode::Num1 ||
+                    kp->scancode == sf::Keyboard::Scancode::Numpad1) {
+                    GameModeManager::instance().selectMode(ModeType::PvP);
+                    ScoreManager::instance().reset();
+                    m_ball->reset();
+                    m_currentState = GameState::PLAYING;
+                } else if (kp->scancode == sf::Keyboard::Scancode::Num2 ||
+                           kp->scancode == sf::Keyboard::Scancode::Numpad2) {
+                    GameModeManager::instance().selectMode(ModeType::PvAI);
+                    ScoreManager::instance().reset();
+                    m_ball->reset();
+                    m_currentState = GameState::PLAYING;
+                }
+                continue;
+            }
+
+            // Toggle pause in gameplay
+            if (kp->scancode == sf::Keyboard::Scancode::Space &&
+                m_currentState != GameState::MENU) {
                 if (m_currentState == GameState::PLAYING) {
                     m_currentState = GameState::PAUSED;
-                } else {
+                    EventManager::instance().emit(
+                        {EventType::GAME_PAUSED, "paused"});
+                } else if (m_currentState == GameState::PAUSED) {
                     m_currentState = GameState::PLAYING;
+                    EventManager::instance().emit(
+                        {EventType::GAME_RESUMED, "resumed"});
                 }
             }
         }
@@ -113,31 +148,29 @@ void Game::processEvents() {
 
 // Update game logic
 void Game::update(float deltaTime) {
-    // Skip updates while paused
-    if (m_currentState == GameState::PAUSED) {
+    // Skip updates while paused or in menu/game over states
+    if (m_currentState == GameState::PAUSED ||
+        m_currentState == GameState::MENU ||
+        m_currentState == GameState::GAME_OVER) {
         return;
     }
 
-    // Handle continuous input for left paddle (W/S)
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W)) {
-        m_leftPaddle->moveUp();
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S)) {
-        m_leftPaddle->moveDown();
+    // Delegate paddle control to the active game mode
+    if (auto *mode = GameModeManager::instance().currentMode()) {
+        mode->update(deltaTime, *m_ball, *m_leftPaddle, *m_rightPaddle);
+    } else {
+        // Fallback to PvAI controls if no mode is set
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W)) {
+            m_leftPaddle->moveUp();
+        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S)) {
+            m_leftPaddle->moveDown();
+        }
+        m_leftPaddle->update(deltaTime);
+
+        const float ballCenterY =
+            m_ball->getBounds().position.y + m_ball->getBounds().size.y / 2.0f;
+        m_rightPaddle->updateAI(ballCenterY, deltaTime);
     }
-
-    // Handle continuous input for right paddle (arrow keys)
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up)) {
-        m_rightPaddle->moveUp();
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down)) {
-        m_rightPaddle->moveDown();
-    }
-
-    m_leftPaddle->update(deltaTime);
-
-    // AI update for right paddle
-    const float ballCenterY =
-        m_ball->getBounds().position.y + m_ball->getBounds().size.y / 2.0f;
-    m_rightPaddle->updateAI(ballCenterY, deltaTime);
 
     m_ball->update(deltaTime);
 
@@ -147,6 +180,15 @@ void Game::update(float deltaTime) {
 // Render all game objects
 void Game::render() {
     m_window.clear(sf::Color::Black);
+
+    // Menu screen
+    if (m_currentState == GameState::MENU) {
+        if (m_menuText) {
+            m_window.draw(*m_menuText);
+        }
+        m_window.display();
+        return;
+    }
 
     // Draw game objects
     if (m_leftPaddle) {

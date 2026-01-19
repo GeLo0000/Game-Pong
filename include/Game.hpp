@@ -7,7 +7,7 @@
 #include <optional>
 
 // Game state enum
-enum class GameState { PLAYING, PAUSED };
+enum class GameState { MENU, PLAYING, PAUSED, GAME_OVER };
 
 // Main game controller class
 class Game {
@@ -35,10 +35,11 @@ class Game {
     std::unique_ptr<Paddle> m_rightPaddle;
     std::unique_ptr<Ball> m_ball;
 
-    // Score display
+    // UI text
     sf::Font m_font;
     std::optional<sf::Text> m_scoreText;
     std::optional<sf::Text> m_pausedText;
+    std::optional<sf::Text> m_menuText;
 
     // Game state
     GameState m_currentState;

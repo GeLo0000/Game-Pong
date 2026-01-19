@@ -4,7 +4,7 @@
 
 // Observer interface for event handling
 class IEventListener {
-public:
+  public:
     virtual ~IEventListener() = default;
-    virtual void onEvent(const Event& event) = 0;
+    virtual void onEvent(const Event &event) = 0;
 };

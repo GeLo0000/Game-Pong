@@ -10,6 +10,7 @@ set(SOURCES
     src/Ball.cpp
     src/EventManager.cpp
     src/ScoreManager.cpp
+    src/GameMode.cpp
 )
 
 set(HEADERS
@@ -20,6 +21,7 @@ set(HEADERS
     include/EventManager.hpp
     include/IEventListener.hpp
     include/ScoreManager.hpp
+    include/GameMode.hpp
 )
 
 include(FetchContent)
