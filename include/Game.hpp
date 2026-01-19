@@ -36,7 +36,6 @@ class Game {
     std::unique_ptr<Ball> m_ball;
 
     // UI text
-    sf::Font m_font;
     std::optional<sf::Text> m_scoreText;
     std::optional<sf::Text> m_pausedText;
     std::optional<sf::Text> m_menuText;

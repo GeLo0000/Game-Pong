@@ -1,6 +1,8 @@
 #include "Game.hpp"
+#include "AudioManager.hpp"
 #include "EventManager.hpp"
 #include "GameMode.hpp"
+#include "ResourceManager.hpp"
 #include "ScoreManager.hpp"
 #include <iostream>
 #include <string>
@@ -14,6 +16,9 @@ Game::Game()
       m_currentState(GameState::MENU) {
     m_window.setFramerateLimit(144);
 
+    // Initialize managers that need subscriptions
+    AudioManager::instance();
+
     // Subscribe to events for quick console verification
     EventManager::instance().subscribe(
         EventType::PADDLE_HIT, [](const Event &e) {
@@ -26,6 +31,10 @@ Game::Game()
         EventType::GOAL_SCORED, [](const Event &e) {
             std::cout << "Event: GOAL_SCORED (" << e.info << ")\n";
         });
+
+    // Preload assets
+    ResourceManager::instance().loadFont("main_font",
+                                         "assets/fonts/Roboto-Regular.ttf");
 
     // Create left paddle
     const float paddleWidth = 15.0f;
@@ -44,26 +53,13 @@ Game::Game()
     m_ball = std::make_unique<Ball>(m_windowWidth / 2.0f, m_windowHeight / 2.0f,
                                     ballRadius, m_windowWidth, m_windowHeight);
 
-    // Load font and setup score display
-    // Try to load from common system font paths
-    // TODO add font file to assets and load from there
-    const char *fontPaths[] = {
-        "assets/arial.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        "/usr/share/fonts/TTF/DejaVuSans.ttf"};
-
-    bool fontLoaded = false;
-    for (const char *path : fontPaths) {
-        if (m_font.openFromFile(path)) {
-            fontLoaded = true;
-            break;
-        }
-    }
-
-    if (!fontLoaded) {
+    // Load font via resource manager
+    const sf::Font *font = ResourceManager::instance().getFont("main_font");
+    if (!font) {
         std::cerr << "Warning: Could not load font\n";
     }
 
-    m_scoreText = sf::Text(m_font);
+    m_scoreText = sf::Text(*font);
     m_scoreText->setCharacterSize(30);
     m_scoreText->setFillColor(sf::Color::White);
     m_scoreText->setPosition({m_windowWidth / 2.0f - 50.0f, 20.0f});
@@ -72,7 +68,7 @@ Game::Game()
     ScoreManager::instance();
 
     // Pause overlay text
-    m_pausedText = sf::Text(m_font);
+    m_pausedText = sf::Text(*font);
     m_pausedText->setString("PAUSED");
     m_pausedText->setCharacterSize(40);
     m_pausedText->setFillColor(sf::Color::White);
@@ -80,7 +76,7 @@ Game::Game()
         {m_windowWidth / 2.0f - 80.0f, m_windowHeight / 2.0f - 20.0f});
 
     // Menu text
-    m_menuText = sf::Text(m_font);
+    m_menuText = sf::Text(*font);
     m_menuText->setString(
         "PONG\n\n1 - PvP (W/S vs Up/Down)\n2 - PvAI (W/S vs AI)\nESC - Quit");
     m_menuText->setCharacterSize(26);
@@ -119,12 +115,16 @@ void Game::processEvents() {
                     ScoreManager::instance().reset();
                     m_ball->reset();
                     m_currentState = GameState::PLAYING;
+                    AudioManager::instance().playBackgroundMusic(
+                        "assets/audio/background.ogg");
                 } else if (kp->scancode == sf::Keyboard::Scancode::Num2 ||
                            kp->scancode == sf::Keyboard::Scancode::Numpad2) {
                     GameModeManager::instance().selectMode(ModeType::PvAI);
                     ScoreManager::instance().reset();
                     m_ball->reset();
                     m_currentState = GameState::PLAYING;
+                    AudioManager::instance().playBackgroundMusic(
+                        "assets/audio/background.ogg");
                 }
                 continue;
             }
@@ -205,7 +205,7 @@ void Game::render() {
     if (m_scoreText) {
         const int leftScore = ScoreManager::instance().getLeftScore();
         const int rightScore = ScoreManager::instance().getRightScore();
-        m_scoreText->setString(std::to_string(leftScore) + "   " +
+        m_scoreText->setString(std::to_string(leftScore) + " : " +
                                std::to_string(rightScore));
         m_window.draw(*m_scoreText);
     }

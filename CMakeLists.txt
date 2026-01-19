@@ -11,6 +11,8 @@ set(SOURCES
     src/EventManager.cpp
     src/ScoreManager.cpp
     src/GameMode.cpp
+    src/ResourceManager.cpp
+    src/AudioManager.cpp
 )
 
 set(HEADERS
@@ -22,6 +24,8 @@ set(HEADERS
     include/IEventListener.hpp
     include/ScoreManager.hpp
     include/GameMode.hpp
+    include/ResourceManager.hpp
+    include/AudioManager.hpp
 )
 
 include(FetchContent)
