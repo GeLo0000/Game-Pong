@@ -30,10 +30,10 @@ Game::Game()
         std::make_unique<Paddle>(50.0f, m_windowHeight / 2.0f, paddleWidth,
                                  paddleHeight, m_windowHeight);
 
-    // Create right paddle
+    // Create right paddle (AI-controlled)
     m_rightPaddle = std::make_unique<Paddle>(
         m_windowWidth - 50.0f - paddleWidth, m_windowHeight / 2.0f, paddleWidth,
-        paddleHeight, m_windowHeight);
+        paddleHeight, m_windowHeight, true); // isAI = true
 
     // Create ball in center
     const float ballRadius = 10.0f;
@@ -83,7 +83,11 @@ void Game::update(float deltaTime) {
     }
 
     m_leftPaddle->update(deltaTime);
-    m_rightPaddle->update(deltaTime);
+
+    // AI update for right paddle
+    const float ballCenterY =
+        m_ball->getBounds().position.y + m_ball->getBounds().size.y / 2.0f;
+    m_rightPaddle->updateAI(ballCenterY, deltaTime);
     m_ball->update(deltaTime);
 
     handleCollisions();
