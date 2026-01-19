@@ -5,10 +5,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(SOURCES
     src/main.cpp
+    src/Game.cpp
 )
 
 set(HEADERS
-    
+    include/Game.hpp
 )
 
 include(FetchContent)
@@ -44,7 +45,6 @@ add_custom_command(TARGET Game-Pong POST_BUILD
     COMMENT "Copying assets to bin directory"
 )
 
-# VS_STARTUP_PROJECT works only with Visual Studio generators
 if(MSVC)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Game-Pong)
 endif()
