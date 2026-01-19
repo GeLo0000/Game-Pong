@@ -8,6 +8,7 @@ set(SOURCES
     src/Game.cpp
     src/Paddle.cpp
     src/Ball.cpp
+    src/EventManager.cpp
 )
 
 set(HEADERS
@@ -15,6 +16,8 @@ set(HEADERS
     include/IGameObject.hpp
     include/Paddle.hpp
     include/Ball.hpp
+    include/EventManager.hpp
+    include/IEventListener.hpp
 )
 
 include(FetchContent)

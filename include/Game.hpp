@@ -16,6 +16,7 @@ class Game {
     void processEvents();
     void update(float deltaTime);
     void render();
+    void handleCollisions();
 
   private:
     // Window dimensions

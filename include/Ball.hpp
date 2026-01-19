@@ -14,6 +14,8 @@ class Ball : public IGameObject {
 
     void reset();
     void setVelocity(float vx, float vy);
+    sf::Vector2f getVelocity() const;
+    void setPosition(sf::Vector2f position);
 
   private:
     sf::CircleShape m_shape;

@@ -1,4 +1,6 @@
 #include "Game.hpp"
+#include "EventManager.hpp"
+#include <iostream>
 
 // Initialize game window and create game objects
 Game::Game()
@@ -6,7 +8,20 @@ Game::Game()
       m_window(sf::VideoMode({static_cast<unsigned int>(m_windowWidth),
                               static_cast<unsigned int>(m_windowHeight)}),
                "Pong Game") {
-    m_window.setFramerateLimit(144);
+    m_window.setFramerateLimit(60);
+
+    // Subscribe to events for quick console verification
+    EventManager::instance().subscribe(
+        EventType::PADDLE_HIT, [](const Event &e) {
+            std::cout << "Event: PADDLE_HIT (" << e.info << ")\n";
+        });
+    EventManager::instance().subscribe(EventType::WALL_HIT, [](const Event &e) {
+        std::cout << "Event: WALL_HIT (" << e.info << ")\n";
+    });
+    EventManager::instance().subscribe(
+        EventType::GOAL_SCORED, [](const Event &e) {
+            std::cout << "Event: GOAL_SCORED (" << e.info << ")\n";
+        });
 
     // Create left paddle
     const float paddleWidth = 15.0f;
@@ -16,10 +31,9 @@ Game::Game()
                                  paddleHeight, m_windowHeight);
 
     // Create right paddle
-    m_rightPaddle =
-        std::make_unique<Paddle>(m_windowWidth - 50.0f - paddleWidth,
-                                 m_windowHeight / 2.0f, paddleWidth,
-                                 paddleHeight, m_windowHeight);
+    m_rightPaddle = std::make_unique<Paddle>(
+        m_windowWidth - 50.0f - paddleWidth, m_windowHeight / 2.0f, paddleWidth,
+        paddleHeight, m_windowHeight);
 
     // Create ball in center
     const float ballRadius = 10.0f;
@@ -71,6 +85,8 @@ void Game::update(float deltaTime) {
     m_leftPaddle->update(deltaTime);
     m_rightPaddle->update(deltaTime);
     m_ball->update(deltaTime);
+
+    handleCollisions();
 }
 
 // Render all game objects
@@ -89,4 +105,55 @@ void Game::render() {
     }
 
     m_window.display();
+}
+
+// Collision handling: paddles, walls, goals
+void Game::handleCollisions() {
+    auto ballBounds = m_ball->getBounds();
+    const auto velocity = m_ball->getVelocity();
+
+    // Top/Bottom walls
+    if (ballBounds.position.y < 0.0f) {
+        ballBounds.position.y = 0.0f;
+        m_ball->setPosition(ballBounds.position);
+        m_ball->setVelocity(velocity.x, -velocity.y);
+        EventManager::instance().emit({EventType::WALL_HIT, "top"});
+    } else if (ballBounds.position.y + ballBounds.size.y > m_windowHeight) {
+        ballBounds.position.y = m_windowHeight - ballBounds.size.y;
+        m_ball->setPosition(ballBounds.position);
+        m_ball->setVelocity(velocity.x, -velocity.y);
+        EventManager::instance().emit({EventType::WALL_HIT, "bottom"});
+    }
+
+    // Left/Right goals
+    if (ballBounds.position.x + ballBounds.size.x < 0.0f) {
+        EventManager::instance().emit({EventType::GOAL_SCORED, "left wall"});
+        m_ball->reset();
+        return;
+    }
+    if (ballBounds.position.x > m_windowWidth) {
+        EventManager::instance().emit({EventType::GOAL_SCORED, "right wall"});
+        m_ball->reset();
+        return;
+    }
+
+    // Paddle collisions (AABB via findIntersection)
+    const auto leftBounds = m_leftPaddle->getBounds();
+    if (leftBounds.findIntersection(ballBounds).has_value()) {
+        auto pos = ballBounds.position;
+        pos.x = leftBounds.position.x + leftBounds.size.x;
+        m_ball->setPosition(pos);
+        m_ball->setVelocity(std::abs(velocity.x), velocity.y);
+        EventManager::instance().emit({EventType::PADDLE_HIT, "left paddle"});
+        return;
+    }
+
+    const auto rightBounds = m_rightPaddle->getBounds();
+    if (rightBounds.findIntersection(ballBounds).has_value()) {
+        auto pos = ballBounds.position;
+        pos.x = rightBounds.position.x - ballBounds.size.x;
+        m_ball->setPosition(pos);
+        m_ball->setVelocity(std::abs(velocity.x) * -1.0f, velocity.y);
+        EventManager::instance().emit({EventType::PADDLE_HIT, "right paddle"});
+    }
 }
