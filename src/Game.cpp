@@ -1,6 +1,8 @@
 #include "Game.hpp"
 #include "EventManager.hpp"
+#include "ScoreManager.hpp"
 #include <iostream>
+#include <string>
 
 // Initialize game window and create game objects
 Game::Game()
@@ -8,7 +10,7 @@ Game::Game()
       m_window(sf::VideoMode({static_cast<unsigned int>(m_windowWidth),
                               static_cast<unsigned int>(m_windowHeight)}),
                "Pong Game") {
-    m_window.setFramerateLimit(60);
+    m_window.setFramerateLimit(144);
 
     // Subscribe to events for quick console verification
     EventManager::instance().subscribe(
@@ -39,6 +41,32 @@ Game::Game()
     const float ballRadius = 10.0f;
     m_ball = std::make_unique<Ball>(m_windowWidth / 2.0f, m_windowHeight / 2.0f,
                                     ballRadius, m_windowWidth, m_windowHeight);
+
+    // Load font and setup score display
+    // Try to load from common system font paths
+    const char *fontPaths[] = {
+        "assets/arial.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/TTF/DejaVuSans.ttf"};
+
+    bool fontLoaded = false;
+    for (const char *path : fontPaths) {
+        if (m_font.openFromFile(path)) {
+            fontLoaded = true;
+            break;
+        }
+    }
+
+    if (!fontLoaded) {
+        std::cerr << "Warning: Could not load font\n";
+    }
+
+    m_scoreText = sf::Text(m_font);
+    m_scoreText->setCharacterSize(30);
+    m_scoreText->setFillColor(sf::Color::White);
+    m_scoreText->setPosition({m_windowWidth / 2.0f - 50.0f, 20.0f});
+
+    // Initialize ScoreManager
+    ScoreManager::instance();
 }
 
 Game::~Game() = default;
@@ -88,6 +116,7 @@ void Game::update(float deltaTime) {
     const float ballCenterY =
         m_ball->getBounds().position.y + m_ball->getBounds().size.y / 2.0f;
     m_rightPaddle->updateAI(ballCenterY, deltaTime);
+
     m_ball->update(deltaTime);
 
     handleCollisions();
@@ -106,6 +135,15 @@ void Game::render() {
     }
     if (m_ball) {
         m_ball->draw(m_window);
+    }
+
+    // Update and draw score
+    if (m_scoreText) {
+        const int leftScore = ScoreManager::instance().getLeftScore();
+        const int rightScore = ScoreManager::instance().getRightScore();
+        m_scoreText->setString(std::to_string(leftScore) + "   " +
+                               std::to_string(rightScore));
+        m_window.draw(*m_scoreText);
     }
 
     m_window.display();
@@ -145,7 +183,8 @@ void Game::handleCollisions() {
     const auto leftBounds = m_leftPaddle->getBounds();
     if (leftBounds.findIntersection(ballBounds).has_value()) {
         auto pos = ballBounds.position;
-        pos.x = leftBounds.position.x + leftBounds.size.x;
+        pos.x =
+            leftBounds.position.x + leftBounds.size.x; // place next to paddle
         m_ball->setPosition(pos);
         m_ball->setVelocity(std::abs(velocity.x), velocity.y);
         EventManager::instance().emit({EventType::PADDLE_HIT, "left paddle"});
@@ -155,7 +194,8 @@ void Game::handleCollisions() {
     const auto rightBounds = m_rightPaddle->getBounds();
     if (rightBounds.findIntersection(ballBounds).has_value()) {
         auto pos = ballBounds.position;
-        pos.x = rightBounds.position.x - ballBounds.size.x;
+        pos.x =
+            rightBounds.position.x - ballBounds.size.x; // place next to paddle
         m_ball->setPosition(pos);
         m_ball->setVelocity(std::abs(velocity.x) * -1.0f, velocity.y);
         EventManager::instance().emit({EventType::PADDLE_HIT, "right paddle"});

@@ -4,6 +4,7 @@
 #include "Paddle.hpp"
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <optional>
 
 // Main game controller class
 class Game {
@@ -30,4 +31,8 @@ class Game {
     std::unique_ptr<Paddle> m_leftPaddle;
     std::unique_ptr<Paddle> m_rightPaddle;
     std::unique_ptr<Ball> m_ball;
+
+    // Score display
+    sf::Font m_font;
+    std::optional<sf::Text> m_scoreText;
 };

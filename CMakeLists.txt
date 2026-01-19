@@ -9,6 +9,7 @@ set(SOURCES
     src/Paddle.cpp
     src/Ball.cpp
     src/EventManager.cpp
+    src/ScoreManager.cpp
 )
 
 set(HEADERS
@@ -18,6 +19,7 @@ set(HEADERS
     include/Ball.hpp
     include/EventManager.hpp
     include/IEventListener.hpp
+    include/ScoreManager.hpp
 )
 
 include(FetchContent)
