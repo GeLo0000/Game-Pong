@@ -2,12 +2,12 @@
 
 #include "Game.hpp"
 
-bool InputHandler::handleKeyPress(const sf::Event::KeyPressed &key, GameState &state, Ball &ball) {
+bool InputHandler::handleCloseGameKey(const sf::Event::KeyPressed &key) {
+    // Escape key closes the game
     if (key.scancode == sf::Keyboard::Scancode::Escape) {
-        return true; // Close window
+        return true;
     }
-
-    return handleGameplayKeyPress(key, state, ball);
+    return false;
 }
 
 bool InputHandler::handleMenuInput(const sf::Event::KeyPressed &key, Ball &ball) {

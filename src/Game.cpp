@@ -66,18 +66,21 @@ void Game::processEvents() {
         if (ev->is<sf::Event::Closed>()) {
             m_window.close();
         } else if (const auto *kp = ev->getIf<sf::Event::KeyPressed>()) {
+            // Global close key
+            if (m_inputHandler->handleCloseGameKey(*kp)) {
+                m_window.close();
+            }
             // Menu input handling
             if (m_currentState == GameState::MENU) {
                 if (m_inputHandler->handleMenuInput(*kp, *m_ball)) {
                     m_currentState = GameState::PLAYING;
                     AudioManager::instance().playBackgroundMusic("assets/audio/background.ogg");
                 }
-                // continue;
+                continue;
             }
-
             // Gameplay input handling (pause/resume, restart, menu)
-            if (m_inputHandler->handleKeyPress(*kp, m_currentState, *m_ball)) {
-                m_window.close();
+            if (m_currentState == GameState::PAUSED || m_currentState == GameState::PLAYING) {
+                m_inputHandler->handleGameplayKeyPress(*kp, m_currentState, *m_ball);
             }
         }
     }
@@ -121,7 +124,7 @@ void Game::render() {
         m_ball->draw(m_window);
     }
 
-    // Render sscore and pause overlay
+    // Render score and pause overlay
     m_uiManager->renderGameUI(m_window, m_ball->getVelocity());
 
     if (m_currentState == GameState::PAUSED) {

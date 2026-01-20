@@ -12,11 +12,11 @@ class AudioManager {
   public:
     static AudioManager &instance();
 
-    bool playBackgroundMusic(const std::string &path, float volume = 5.0f);
+    bool playBackgroundMusic(const std::string &path, float volume = 20.0f);
     void pauseBackgroundMusic();
     void resumeBackgroundMusic();
 
-    void playSoundEffect(const std::string &name, float volume = 20.0f);
+    void playSoundEffect(const std::string &name, float volume = 65.0f);
 
   private:
     AudioManager();

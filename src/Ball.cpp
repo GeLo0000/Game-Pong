@@ -40,7 +40,7 @@ void Ball::reset() {
 
     float angle = angleDist(gen);
     float radians = angle * 3.14159f / 180.0f;
-    float baseSpeed = 200.0f;
+    float baseSpeed = 300.0f;
     float dirX = dirDist(gen) == 0 ? 1.0f : -1.0f;
 
     m_velocity = {dirX * baseSpeed * std::cos(radians), baseSpeed * std::sin(radians)};

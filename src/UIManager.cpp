@@ -33,7 +33,7 @@ void UIManager::loadFont(const sf::Font *font) {
 
     // Exit hint
     m_exitHintText = sf::Text(*font);
-    m_exitHintText->setString("Press Esc to exit");
+    m_exitHintText->setString(" Esc - Exit\n Space - Pause\n R - Restart\n M - Menu");
     m_exitHintText->setCharacterSize(18);
     m_exitHintText->setFillColor(sf::Color(200, 200, 200));
     m_exitHintText->setPosition({20.0f, 20.0f});
@@ -58,7 +58,7 @@ void UIManager::createMenuButtons() {
     m_menuButtons.push_back(pvpButton);
 
     sf::Text pvpText(m_scoreText->getFont());
-    pvpText.setString("Player vs Player");
+    pvpText.setString("Player vs Player\n    (Press '1')");
     pvpText.setCharacterSize(24);
     pvpText.setFillColor(sf::Color::White);
     centerTextInButton(pvpText, pvpButton);
@@ -73,7 +73,7 @@ void UIManager::createMenuButtons() {
     m_menuButtons.push_back(pvaiButton);
 
     sf::Text pvaiText(m_scoreText->getFont());
-    pvaiText.setString("Player vs Bot");
+    pvaiText.setString("Player vs Bot\n  (Press '2')");
     pvaiText.setCharacterSize(24);
     pvaiText.setFillColor(sf::Color::White);
     centerTextInButton(pvaiText, pvaiButton);
@@ -148,6 +148,7 @@ void UIManager::renderMenu(sf::RenderWindow &window) {
 }
 
 void UIManager::renderGameUI(sf::RenderWindow &window, sf::Vector2f ballVelocity) {
+    // Display score
     const int leftScore = ScoreManager::instance().getLeftScore();
     const int rightScore = ScoreManager::instance().getRightScore();
     if (m_scoreText) {
