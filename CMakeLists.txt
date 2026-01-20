@@ -13,6 +13,7 @@ set(SOURCES
     src/GameMode.cpp
     src/ResourceManager.cpp
     src/AudioManager.cpp
+    src/GameObjectFactory.cpp
 )
 
 set(HEADERS
@@ -26,6 +27,7 @@ set(HEADERS
     include/GameMode.hpp
     include/ResourceManager.hpp
     include/AudioManager.hpp
+    include/GameObjectFactory.hpp
 )
 
 include(FetchContent)

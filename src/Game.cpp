@@ -2,6 +2,7 @@
 #include "AudioManager.hpp"
 #include "EventManager.hpp"
 #include "GameMode.hpp"
+#include "GameObjectFactory.hpp"
 #include "ResourceManager.hpp"
 #include "ScoreManager.hpp"
 #include <iostream>
@@ -36,22 +37,23 @@ Game::Game()
     ResourceManager::instance().loadFont("main_font",
                                          "assets/fonts/Roboto-Regular.ttf");
 
-    // Create left paddle
+    // Create game objects using factory
+    auto &factory = GameObjectFactory::instance();
     const float paddleWidth = 15.0f;
     const float paddleHeight = 100.0f;
     m_leftPaddle =
-        std::make_unique<Paddle>(50.0f, m_windowHeight / 2.0f, paddleWidth,
-                                 paddleHeight, m_windowHeight);
+        factory.createPaddle(50.0f, m_windowHeight / 2.0f, paddleWidth,
+                             paddleHeight, m_windowHeight);
 
-    // Create right paddle (AI-controlled)
-    m_rightPaddle = std::make_unique<Paddle>(
-        m_windowWidth - 50.0f - paddleWidth, m_windowHeight / 2.0f, paddleWidth,
-        paddleHeight, m_windowHeight, true); // isAI = true
+    // Create right paddle
+    m_rightPaddle = factory.createPaddle(m_windowWidth - 50.0f - paddleWidth,
+                                         m_windowHeight / 2.0f, paddleWidth,
+                                         paddleHeight, m_windowHeight, true);
 
     // Create ball in center
     const float ballRadius = 10.0f;
-    m_ball = std::make_unique<Ball>(m_windowWidth / 2.0f, m_windowHeight / 2.0f,
-                                    ballRadius, m_windowWidth, m_windowHeight);
+    m_ball = factory.createBall(m_windowWidth / 2.0f, m_windowHeight / 2.0f,
+                                ballRadius, m_windowWidth, m_windowHeight);
 
     // Load font via resource manager
     const sf::Font *font = ResourceManager::instance().getFont("main_font");
@@ -256,6 +258,7 @@ void Game::handleCollisions() {
             leftBounds.position.x + leftBounds.size.x; // place next to paddle
         m_ball->setPosition(pos);
         m_ball->setVelocity(std::abs(velocity.x), velocity.y);
+        m_ball->increaseSpeed();
         EventManager::instance().emit({EventType::PADDLE_HIT, "left paddle"});
         return;
     }
@@ -267,6 +270,7 @@ void Game::handleCollisions() {
             rightBounds.position.x - ballBounds.size.x; // place next to paddle
         m_ball->setPosition(pos);
         m_ball->setVelocity(std::abs(velocity.x) * -1.0f, velocity.y);
+        m_ball->increaseSpeed();
         EventManager::instance().emit({EventType::PADDLE_HIT, "right paddle"});
     }
 }
