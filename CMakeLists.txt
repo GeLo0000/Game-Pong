@@ -14,6 +14,9 @@ set(SOURCES
     src/ResourceManager.cpp
     src/AudioManager.cpp
     src/GameObjectFactory.cpp
+    src/UIManager.cpp
+    src/InputHandler.cpp
+    src/CollisionHandler.cpp
 )
 
 set(HEADERS
@@ -28,6 +31,9 @@ set(HEADERS
     include/ResourceManager.hpp
     include/AudioManager.hpp
     include/GameObjectFactory.hpp
+    include/UIManager.hpp
+    include/InputHandler.hpp
+    include/CollisionHandler.hpp
 )
 
 include(FetchContent)

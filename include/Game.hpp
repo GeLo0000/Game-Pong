@@ -2,6 +2,9 @@
 
 #include "Ball.hpp"
 #include "Paddle.hpp"
+#include "UIManager.hpp"
+#include "InputHandler.hpp"
+#include "CollisionHandler.hpp"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <optional>
@@ -35,10 +38,10 @@ class Game {
     std::unique_ptr<Paddle> m_rightPaddle;
     std::unique_ptr<Ball> m_ball;
 
-    // UI text
-    std::optional<sf::Text> m_scoreText;
-    std::optional<sf::Text> m_pausedText;
-    std::optional<sf::Text> m_menuText;
+    // Manager objects
+    std::unique_ptr<UIManager> m_uiManager;
+    std::unique_ptr<InputHandler> m_inputHandler;
+    std::unique_ptr<CollisionHandler> m_collisionHandler;
 
     // Game state
     GameState m_currentState;
