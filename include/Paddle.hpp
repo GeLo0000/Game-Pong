@@ -6,8 +6,7 @@
 // Player paddle
 class Paddle : public IGameObject {
   public:
-    Paddle(float x, float y, float width, float height, float windowHeight,
-           bool isAI = false);
+    Paddle(float x, float y, float width, float height, float windowHeight, bool isAI = false);
 
     void update(float deltaTime) override;
     void updateAI(float ballY, float deltaTime); // AI movement logic

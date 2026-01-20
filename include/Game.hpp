@@ -25,8 +25,6 @@ class Game {
     void handleCollisions();
 
     // Initialization methods
-    void initializeManagers();
-    void loadResources();
     void createGameObjects();
     void initializeComponents();
 

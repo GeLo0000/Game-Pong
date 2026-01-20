@@ -22,8 +22,7 @@ void UIManager::loadFont(const sf::Font *font) {
     m_speedText = sf::Text(*font);
     m_speedText->setCharacterSize(20);
     m_speedText->setFillColor(sf::Color(150, 150, 150));
-    m_speedText->setPosition(
-        {m_windowWidth / 2.0f - 60.0f, m_windowHeight - 40.0f});
+    m_speedText->setPosition({m_windowWidth / 2.0f - 60.0f, m_windowHeight - 40.0f});
 
     // Main menu title
     m_titleText = sf::Text(*font);
@@ -108,8 +107,8 @@ void UIManager::createPauseMenu() {
     const float btnStartX = overlayX + 12.0f;
     const float btnY = overlayY + overlayHeight - btnHeight - 12.0f;
 
-    std::vector<std::string> buttonLabels = {"Continue (Space)", "Restart (R)",
-                                             "Menu (M)", "Exit (Esc)"};
+    std::vector<std::string> buttonLabels = {"Continue (Space)", "Restart (R)", "Menu (M)",
+                                             "Exit (Esc)"};
 
     for (size_t i = 0; i < buttonLabels.size(); ++i) {
         sf::RectangleShape btn({btnWidth, btnHeight});
@@ -148,22 +147,18 @@ void UIManager::renderMenu(sf::RenderWindow &window) {
     }
 }
 
-void UIManager::renderGameUI(sf::RenderWindow &window,
-                             sf::Vector2f ballVelocity) {
+void UIManager::renderGameUI(sf::RenderWindow &window, sf::Vector2f ballVelocity) {
     const int leftScore = ScoreManager::instance().getLeftScore();
     const int rightScore = ScoreManager::instance().getRightScore();
     if (m_scoreText) {
-        m_scoreText->setString(std::to_string(leftScore) + " : " +
-                               std::to_string(rightScore));
+        m_scoreText->setString(std::to_string(leftScore) + " : " + std::to_string(rightScore));
         window.draw(*m_scoreText);
     }
 
     // Calculate and display ball speed
     if (m_speedText) {
-        float speed = std::sqrt(ballVelocity.x * ballVelocity.x +
-                                ballVelocity.y * ballVelocity.y);
-        m_speedText->setString("Ball Speed: " +
-                               std::to_string(static_cast<int>(speed)));
+        float speed = std::sqrt(ballVelocity.x * ballVelocity.x + ballVelocity.y * ballVelocity.y);
+        m_speedText->setString("Ball Speed: " + std::to_string(static_cast<int>(speed)));
         window.draw(*m_speedText);
     }
 }
@@ -188,10 +183,8 @@ void UIManager::renderPause(sf::RenderWindow &window) {
     }
 }
 
-void UIManager::centerTextInButton(sf::Text &text,
-                                   const sf::RectangleShape &button) {
+void UIManager::centerTextInButton(sf::Text &text, const sf::RectangleShape &button) {
     auto bounds = text.getLocalBounds();
-    text.setPosition(
-        {button.getPosition().x + (button.getSize().x - bounds.size.x) / 2.0f,
-         button.getPosition().y + (button.getSize().y - bounds.size.y) / 2.0f});
+    text.setPosition({button.getPosition().x + (button.getSize().x - bounds.size.x) / 2.0f,
+                      button.getPosition().y + (button.getSize().y - bounds.size.y) / 2.0f});
 }

@@ -41,8 +41,7 @@ void PvPMode::update(float deltaTime, Ball &ball, Paddle &left, Paddle &right) {
     right.update(deltaTime);
 }
 
-void PvAIMode::update(float deltaTime, Ball &ball, Paddle &left,
-                      Paddle &right) {
+void PvAIMode::update(float deltaTime, Ball &ball, Paddle &left, Paddle &right) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W)) {
         left.moveUp();
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S)) {
@@ -51,7 +50,6 @@ void PvAIMode::update(float deltaTime, Ball &ball, Paddle &left,
 
     left.update(deltaTime);
 
-    const float ballCenterY =
-        ball.getBounds().position.y + ball.getBounds().size.y / 2.0f;
+    const float ballCenterY = ball.getBounds().position.y + ball.getBounds().size.y / 2.0f;
     right.updateAI(ballCenterY, deltaTime);
 }

@@ -7,8 +7,7 @@ ResourceManager &ResourceManager::instance() {
     return inst;
 }
 
-bool ResourceManager::loadFont(const std::string &name,
-                               const std::string &path) {
+bool ResourceManager::loadFont(const std::string &name, const std::string &path) {
     sf::Font font;
     if (!font.openFromFile(path)) {
         std::cerr << "Failed to load font: " << path << "\n";
@@ -18,8 +17,7 @@ bool ResourceManager::loadFont(const std::string &name,
     return true;
 }
 
-bool ResourceManager::loadSoundBuffer(const std::string &name,
-                                      const std::string &path) {
+bool ResourceManager::loadSoundBuffer(const std::string &name, const std::string &path) {
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(path)) {
         std::cerr << "Failed to load sound: " << path << "\n";
@@ -34,8 +32,7 @@ const sf::Font *ResourceManager::getFont(const std::string &name) const {
     return it != m_fonts.end() ? &it->second : nullptr;
 }
 
-const sf::SoundBuffer *
-ResourceManager::getSoundBuffer(const std::string &name) const {
+const sf::SoundBuffer *ResourceManager::getSoundBuffer(const std::string &name) const {
     auto it = m_soundBuffers.find(name);
     return it != m_soundBuffers.end() ? &it->second : nullptr;
 }

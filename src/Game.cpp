@@ -17,21 +17,11 @@ Game::Game()
       m_currentState(GameState::MENU) {
     m_window.setFramerateLimit(144);
 
-    initializeManagers();
-    loadResources();
     createGameObjects();
     initializeComponents();
 }
 
 Game::~Game() = default;
-
-// Initialize singleton managers
-void Game::initializeManagers() { AudioManager::instance(); }
-
-// Load fonts and other assets
-void Game::loadResources() {
-    ResourceManager::instance().loadFont("main_font", "assets/fonts/Roboto-Regular.ttf");
-}
 
 // Create game objects using factory
 void Game::createGameObjects() {
@@ -52,6 +42,8 @@ void Game::createGameObjects() {
 
 // Initialize component managers
 void Game::initializeComponents() {
+    ResourceManager::instance().loadFont("main_font", "assets/fonts/Roboto-Regular.ttf");
+    AudioManager::instance();
     m_uiManager = std::make_unique<UIManager>(m_windowWidth, m_windowHeight);
     m_uiManager->loadFont(ResourceManager::instance().getFont("main_font"));
     m_inputHandler = std::make_unique<InputHandler>();

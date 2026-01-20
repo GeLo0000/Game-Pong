@@ -2,8 +2,7 @@
 
 #include "Game.hpp"
 
-bool InputHandler::handleKeyPress(const sf::Event::KeyPressed &key,
-                                  GameState &state, Ball &ball) {
+bool InputHandler::handleKeyPress(const sf::Event::KeyPressed &key, GameState &state, Ball &ball) {
     if (key.scancode == sf::Keyboard::Scancode::Escape) {
         return true; // Close window
     }
@@ -11,26 +10,30 @@ bool InputHandler::handleKeyPress(const sf::Event::KeyPressed &key,
     return handleGameplayKeyPress(key, state, ball);
 }
 
-bool InputHandler::handleMenuInput(const sf::Event::KeyPressed &key,
-                                   Ball &ball) {
+bool InputHandler::handleMenuInput(const sf::Event::KeyPressed &key, Ball &ball) {
+    // Map keys 1 and 2 (or numpad) to modes
+    std::optional<ModeType> mode;
+
     if (key.scancode == sf::Keyboard::Scancode::Num1 ||
         key.scancode == sf::Keyboard::Scancode::Numpad1) {
-        GameModeManager::instance().selectMode(ModeType::PvP);
-        ScoreManager::instance().reset();
-        ball.reset();
-        return true; // Start game
+        mode = ModeType::PvP;
     } else if (key.scancode == sf::Keyboard::Scancode::Num2 ||
                key.scancode == sf::Keyboard::Scancode::Numpad2) {
-        GameModeManager::instance().selectMode(ModeType::PvAI);
+        mode = ModeType::PvAI;
+    }
+
+    if (mode.has_value()) {
+        GameModeManager::instance().selectMode(mode.value());
         ScoreManager::instance().reset();
         ball.reset();
         return true; // Start game
     }
+
     return false;
 }
 
-bool InputHandler::handleGameplayKeyPress(const sf::Event::KeyPressed &key,
-                                          GameState &state, Ball &ball) {
+bool InputHandler::handleGameplayKeyPress(const sf::Event::KeyPressed &key, GameState &state,
+                                          Ball &ball) {
     // Space: toggle pause/resume
     if (key.scancode == sf::Keyboard::Scancode::Space) {
         if (state == GameState::PLAYING) {
@@ -62,11 +65,4 @@ bool InputHandler::handleGameplayKeyPress(const sf::Event::KeyPressed &key,
     }
 
     return false;
-}
-
-void InputHandler::handleGameplayInput(float deltaTime, Paddle &leftPaddle,
-                                       Paddle &rightPaddle, Ball &ball) {
-    if (auto *mode = GameModeManager::instance().currentMode()) {
-        mode->update(deltaTime, ball, leftPaddle, rightPaddle);
-    }
 }
