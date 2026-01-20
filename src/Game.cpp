@@ -27,10 +27,7 @@ Game::Game()
 Game::~Game() = default;
 
 // Initialize singleton managers
-void Game::initializeManagers() {
-    AudioManager::instance();
-    ScoreManager::instance();
-}
+void Game::initializeManagers() { AudioManager::instance(); }
 
 // Setup event listeners for debugging
 void Game::setupEventListeners() {
@@ -116,10 +113,9 @@ void Game::processEvents() {
 
 // Update game logic
 void Game::update(float deltaTime) {
-    // Skip updates while paused or in menu/game over states
+    // Skip updates while paused or in menu
     if (m_currentState == GameState::PAUSED ||
-        m_currentState == GameState::MENU ||
-        m_currentState == GameState::GAME_OVER) {
+        m_currentState == GameState::MENU) {
         return;
     }
 

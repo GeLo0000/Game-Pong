@@ -25,7 +25,6 @@ set(HEADERS
     include/Paddle.hpp
     include/Ball.hpp
     include/EventManager.hpp
-    include/IEventListener.hpp
     include/ScoreManager.hpp
     include/GameMode.hpp
     include/ResourceManager.hpp

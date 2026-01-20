@@ -1,16 +1,15 @@
 #pragma once
 
 #include "Ball.hpp"
+#include "CollisionHandler.hpp"
+#include "InputHandler.hpp"
 #include "Paddle.hpp"
 #include "UIManager.hpp"
-#include "InputHandler.hpp"
-#include "CollisionHandler.hpp"
 #include <SFML/Graphics.hpp>
 #include <memory>
-#include <optional>
 
 // Game state enum
-enum class GameState { MENU, PLAYING, PAUSED, GAME_OVER };
+enum class GameState { MENU, PLAYING, PAUSED };
 
 // Main game controller class
 class Game {
