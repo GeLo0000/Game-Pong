@@ -120,4 +120,4 @@ cmake --build .
 - **`ESC`:** Exit game
 
 ## Download
-- Download: [Game-Pong]()
+- Download: [Game-Pong for Windows](https://github.com/GeLo0000/Game-Pong/releases/download/v1.0/Game-Pong.Windows.zip)
