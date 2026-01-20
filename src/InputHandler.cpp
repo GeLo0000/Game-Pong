@@ -8,11 +8,6 @@ bool InputHandler::handleKeyPress(const sf::Event::KeyPressed &key,
         return true; // Close window
     }
 
-    if (state == GameState::MENU) {
-        // Menu input will be handled elsewhere via handleMenuInput
-        return false;
-    }
-
     return handleGameplayKeyPress(key, state);
 }
 

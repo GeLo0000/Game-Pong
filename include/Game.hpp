@@ -25,6 +25,13 @@ class Game {
     void render();
     void handleCollisions();
 
+    // Initialization methods
+    void initializeManagers();
+    void setupEventListeners();
+    void loadResources();
+    void createGameObjects();
+    void initializeComponents();
+
   private:
     // Window dimensions
     float m_windowWidth;

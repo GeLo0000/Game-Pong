@@ -17,10 +17,23 @@ Game::Game()
       m_currentState(GameState::MENU) {
     m_window.setFramerateLimit(144);
 
-    // Initialize managers that need subscriptions
-    AudioManager::instance();
+    initializeManagers();
+    setupEventListeners();
+    loadResources();
+    createGameObjects();
+    initializeComponents();
+}
 
-    // Subscribe to events for quick console verification
+Game::~Game() = default;
+
+// Initialize singleton managers
+void Game::initializeManagers() {
+    AudioManager::instance();
+    ScoreManager::instance();
+}
+
+// Setup event listeners for debugging
+void Game::setupEventListeners() {
     EventManager::instance().subscribe(
         EventType::PADDLE_HIT, [](const Event &e) {
             std::cout << "Event: PADDLE_HIT (" << e.info << ")\n";
@@ -32,40 +45,40 @@ Game::Game()
         EventType::GOAL_SCORED, [](const Event &e) {
             std::cout << "Event: GOAL_SCORED (" << e.info << ")\n";
         });
+}
 
-    // Preload assets
+// Load fonts and other assets
+void Game::loadResources() {
     ResourceManager::instance().loadFont("main_font",
                                          "assets/fonts/Roboto-Regular.ttf");
+}
 
-    // Create game objects using factory
+// Create game objects using factory
+void Game::createGameObjects() {
     auto &factory = GameObjectFactory::instance();
     const float paddleWidth = 15.0f;
     const float paddleHeight = 100.0f;
+
     m_leftPaddle =
         factory.createPaddle(50.0f, m_windowHeight / 2.0f, paddleWidth,
                              paddleHeight, m_windowHeight);
 
-    // Create right paddle
     m_rightPaddle = factory.createPaddle(m_windowWidth - 50.0f - paddleWidth,
                                          m_windowHeight / 2.0f, paddleWidth,
                                          paddleHeight, m_windowHeight, true);
 
-    // Create ball in center
     const float ballRadius = 10.0f;
     m_ball = factory.createBall(m_windowWidth / 2.0f, m_windowHeight / 2.0f,
                                 ballRadius, m_windowWidth, m_windowHeight);
+}
 
-    // Initialize ScoreManager
-    ScoreManager::instance();
-
-    // Initialize managers
+// Initialize component managers
+void Game::initializeComponents() {
     m_uiManager = std::make_unique<UIManager>(m_windowWidth, m_windowHeight);
     m_uiManager->loadFont(ResourceManager::instance().getFont("main_font"));
     m_inputHandler = std::make_unique<InputHandler>();
     m_collisionHandler = std::make_unique<CollisionHandler>();
 }
-
-Game::~Game() = default;
 
 // Main game loop
 void Game::run() {
