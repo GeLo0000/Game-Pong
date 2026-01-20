@@ -16,7 +16,8 @@ class InputHandler {
     ~InputHandler() = default;
 
     // Process key press events; returns true if should close window
-    bool handleKeyPress(const sf::Event::KeyPressed &key, GameState &state);
+    bool handleKeyPress(const sf::Event::KeyPressed &key, GameState &state,
+              Ball &ball);
 
     // Process menu input; returns true if game should start
     bool handleMenuInput(const sf::Event::KeyPressed &key, Ball &ball);
@@ -27,5 +28,5 @@ class InputHandler {
 
   private:
     bool handleGameplayKeyPress(const sf::Event::KeyPressed &key,
-                                GameState &state);
+                  GameState &state, Ball &ball);
 };

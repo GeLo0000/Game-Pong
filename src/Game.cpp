@@ -103,11 +103,11 @@ void Game::processEvents() {
                     AudioManager::instance().playBackgroundMusic(
                         "assets/audio/background.ogg");
                 }
-                continue;
+                // continue;
             }
 
-            // Gameplay input handling (pause/resume)
-            if (m_inputHandler->handleKeyPress(*kp, m_currentState)) {
+            // Gameplay input handling (pause/resume, restart, menu)
+            if (m_inputHandler->handleKeyPress(*kp, m_currentState, *m_ball)) {
                 m_window.close();
             }
         }
@@ -154,10 +154,8 @@ void Game::render() {
         m_ball->draw(m_window);
     }
 
-    // Render score and pause overlay
-    const int leftScore = ScoreManager::instance().getLeftScore();
-    const int rightScore = ScoreManager::instance().getRightScore();
-    m_uiManager->renderGameUI(m_window, leftScore, rightScore);
+    // Render sscore and pause overlay
+    m_uiManager->renderGameUI(m_window, m_ball->getVelocity());
 
     if (m_currentState == GameState::PAUSED) {
         m_uiManager->renderPause(m_window);

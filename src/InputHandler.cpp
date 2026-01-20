@@ -3,12 +3,12 @@
 #include "Game.hpp"
 
 bool InputHandler::handleKeyPress(const sf::Event::KeyPressed &key,
-                                  GameState &state) {
+                                  GameState &state, Ball &ball) {
     if (key.scancode == sf::Keyboard::Scancode::Escape) {
         return true; // Close window
     }
 
-    return handleGameplayKeyPress(key, state);
+    return handleGameplayKeyPress(key, state, ball);
 }
 
 bool InputHandler::handleMenuInput(const sf::Event::KeyPressed &key,
@@ -30,7 +30,8 @@ bool InputHandler::handleMenuInput(const sf::Event::KeyPressed &key,
 }
 
 bool InputHandler::handleGameplayKeyPress(const sf::Event::KeyPressed &key,
-                                          GameState &state) {
+                                          GameState &state, Ball &ball) {
+    // Space: toggle pause/resume
     if (key.scancode == sf::Keyboard::Scancode::Space) {
         if (state == GameState::PLAYING) {
             state = GameState::PAUSED;
@@ -41,6 +42,25 @@ bool InputHandler::handleGameplayKeyPress(const sf::Event::KeyPressed &key,
         }
         return false;
     }
+
+    // R: restart round (reset score and ball, continue playing)
+    if (key.scancode == sf::Keyboard::Scancode::R) {
+        ScoreManager::instance().reset();
+        ball.reset();
+        state = GameState::PLAYING;
+        EventManager::instance().emit({EventType::GAME_RESUMED, "restarted"});
+        return false;
+    }
+
+    // M: back to main menu
+    if (key.scancode == sf::Keyboard::Scancode::M) {
+        ScoreManager::instance().reset();
+        ball.reset();
+        state = GameState::MENU;
+        EventManager::instance().emit({EventType::GAME_PAUSED, "menu"});
+        return false;
+    }
+
     return false;
 }
 

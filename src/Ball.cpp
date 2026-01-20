@@ -75,9 +75,4 @@ void Ball::increaseSpeed() {
         m_velocity.x *= scale;
         m_velocity.y *= scale;
     }
-
-    // Output current speed to console
-    float finalSpeed =
-        std::sqrt(m_velocity.x * m_velocity.x + m_velocity.y * m_velocity.y);
-    std::cout << "Ball speed: " << finalSpeed << "\n";
 }
