@@ -11,7 +11,7 @@ class CollisionHandler {
     ~CollisionHandler() = default;
 
     void handleCollisions(Ball &ball, Paddle &leftPaddle, Paddle &rightPaddle,
-                         const sf::Vector2f &windowSize);
+                          const sf::Vector2f &windowSize);
 
   private:
     void handleWallCollision(Ball &ball, const sf::Vector2f &windowSize);

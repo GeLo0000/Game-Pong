@@ -5,11 +5,9 @@
 #include <random>
 
 // Initialize ball with center position and radius
-Ball::Ball(float x, float y, float radius, float windowWidth,
-           float windowHeight)
-    : m_velocity(200.0f, 150.0f), m_windowWidth(windowWidth),
-      m_windowHeight(windowHeight), m_speedMultiplier(1.05f),
-      m_maxSpeed(2000.0f) {
+Ball::Ball(float x, float y, float radius, float windowWidth, float windowHeight)
+    : m_velocity(200.0f, 150.0f), m_windowWidth(windowWidth), m_windowHeight(windowHeight),
+      m_speedMultiplier(1.05f), m_maxSpeed(2000.0f) {
     m_shape.setRadius(radius);
     m_shape.setPosition({x - radius, y - radius}); // Center the ball
     m_shape.setFillColor(sf::Color::Yellow);
@@ -32,8 +30,7 @@ sf::FloatRect Ball::getBounds() const { return m_shape.getGlobalBounds(); }
 // Reset ball to center with initial velocity
 void Ball::reset() {
     const float radius = m_shape.getRadius();
-    m_shape.setPosition(
-        {(m_windowWidth * 0.5f) - radius, (m_windowHeight * 0.5f) - radius});
+    m_shape.setPosition({(m_windowWidth * 0.5f) - radius, (m_windowHeight * 0.5f) - radius});
 
     // Random direction
     static std::random_device rd;
@@ -46,8 +43,7 @@ void Ball::reset() {
     float baseSpeed = 200.0f;
     float dirX = dirDist(gen) == 0 ? 1.0f : -1.0f;
 
-    m_velocity = {dirX * baseSpeed * std::cos(radians),
-                  baseSpeed * std::sin(radians)};
+    m_velocity = {dirX * baseSpeed * std::cos(radians), baseSpeed * std::sin(radians)};
 }
 
 // Set ball velocity
@@ -59,8 +55,7 @@ void Ball::setPosition(sf::Vector2f position) { m_shape.setPosition(position); }
 
 // Increase speed by multiplier up to max limit
 void Ball::increaseSpeed() {
-    float currentSpeed =
-        std::sqrt(m_velocity.x * m_velocity.x + m_velocity.y * m_velocity.y);
+    float currentSpeed = std::sqrt(m_velocity.x * m_velocity.x + m_velocity.y * m_velocity.y);
     if (currentSpeed >= m_maxSpeed) {
         return; // Already at max speed
     }
@@ -68,8 +63,7 @@ void Ball::increaseSpeed() {
     m_velocity.y *= m_speedMultiplier;
 
     // Clamp to max speed
-    float newSpeed =
-        std::sqrt(m_velocity.x * m_velocity.x + m_velocity.y * m_velocity.y);
+    float newSpeed = std::sqrt(m_velocity.x * m_velocity.x + m_velocity.y * m_velocity.y);
     if (newSpeed > m_maxSpeed) {
         float scale = m_maxSpeed / newSpeed;
         m_velocity.x *= scale;

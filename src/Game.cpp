@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-// Initialize game window and create game objects
+// Initialize game window and components
 Game::Game()
     : m_windowWidth(800.0f), m_windowHeight(600.0f),
       m_window(sf::VideoMode({static_cast<unsigned int>(m_windowWidth),
@@ -18,7 +18,6 @@ Game::Game()
     m_window.setFramerateLimit(144);
 
     initializeManagers();
-    setupEventListeners();
     loadResources();
     createGameObjects();
     initializeComponents();
@@ -29,25 +28,9 @@ Game::~Game() = default;
 // Initialize singleton managers
 void Game::initializeManagers() { AudioManager::instance(); }
 
-// Setup event listeners for debugging
-void Game::setupEventListeners() {
-    EventManager::instance().subscribe(
-        EventType::PADDLE_HIT, [](const Event &e) {
-            std::cout << "Event: PADDLE_HIT (" << e.info << ")\n";
-        });
-    EventManager::instance().subscribe(EventType::WALL_HIT, [](const Event &e) {
-        std::cout << "Event: WALL_HIT (" << e.info << ")\n";
-    });
-    EventManager::instance().subscribe(
-        EventType::GOAL_SCORED, [](const Event &e) {
-            std::cout << "Event: GOAL_SCORED (" << e.info << ")\n";
-        });
-}
-
 // Load fonts and other assets
 void Game::loadResources() {
-    ResourceManager::instance().loadFont("main_font",
-                                         "assets/fonts/Roboto-Regular.ttf");
+    ResourceManager::instance().loadFont("main_font", "assets/fonts/Roboto-Regular.ttf");
 }
 
 // Create game objects using factory
@@ -56,17 +39,15 @@ void Game::createGameObjects() {
     const float paddleWidth = 15.0f;
     const float paddleHeight = 100.0f;
 
-    m_leftPaddle =
-        factory.createPaddle(50.0f, m_windowHeight / 2.0f, paddleWidth,
-                             paddleHeight, m_windowHeight);
+    m_leftPaddle = factory.createPaddle(50.0f, m_windowHeight / 2.0f, paddleWidth, paddleHeight,
+                                        m_windowHeight);
 
-    m_rightPaddle = factory.createPaddle(m_windowWidth - 50.0f - paddleWidth,
-                                         m_windowHeight / 2.0f, paddleWidth,
-                                         paddleHeight, m_windowHeight, true);
+    m_rightPaddle = factory.createPaddle(m_windowWidth - 50.0f - paddleWidth, m_windowHeight / 2.0f,
+                                         paddleWidth, paddleHeight, m_windowHeight, true);
 
     const float ballRadius = 10.0f;
-    m_ball = factory.createBall(m_windowWidth / 2.0f, m_windowHeight / 2.0f,
-                                ballRadius, m_windowWidth, m_windowHeight);
+    m_ball = factory.createBall(m_windowWidth / 2.0f, m_windowHeight / 2.0f, ballRadius,
+                                m_windowWidth, m_windowHeight);
 }
 
 // Initialize component managers
@@ -97,8 +78,7 @@ void Game::processEvents() {
             if (m_currentState == GameState::MENU) {
                 if (m_inputHandler->handleMenuInput(*kp, *m_ball)) {
                     m_currentState = GameState::PLAYING;
-                    AudioManager::instance().playBackgroundMusic(
-                        "assets/audio/background.ogg");
+                    AudioManager::instance().playBackgroundMusic("assets/audio/background.ogg");
                 }
                 // continue;
             }
@@ -114,8 +94,7 @@ void Game::processEvents() {
 // Update game logic
 void Game::update(float deltaTime) {
     // Skip updates while paused or in menu
-    if (m_currentState == GameState::PAUSED ||
-        m_currentState == GameState::MENU) {
+    if (m_currentState == GameState::PAUSED || m_currentState == GameState::MENU) {
         return;
     }
 

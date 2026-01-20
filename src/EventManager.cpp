@@ -15,8 +15,7 @@ std::size_t EventManager::subscribe(EventType type, Callback cb) {
 
 void EventManager::unsubscribe(EventType type, std::size_t id) {
     auto &vec = m_listeners[type];
-    vec.erase(std::remove_if(vec.begin(), vec.end(),
-                             [id](const auto &p) { return p.first == id; }),
+    vec.erase(std::remove_if(vec.begin(), vec.end(), [id](const auto &p) { return p.first == id; }),
               vec.end());
 }
 

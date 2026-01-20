@@ -18,24 +18,19 @@ AudioManager::AudioManager() {
     auto &em = EventManager::instance();
     m_subscriptions.push_back(
         {EventType::PADDLE_HIT,
-         em.subscribe(EventType::PADDLE_HIT,
-                      [this](const Event &e) { onEvent(e); })});
+         em.subscribe(EventType::PADDLE_HIT, [this](const Event &e) { onEvent(e); })});
     m_subscriptions.push_back(
         {EventType::WALL_HIT,
-         em.subscribe(EventType::WALL_HIT,
-                      [this](const Event &e) { onEvent(e); })});
+         em.subscribe(EventType::WALL_HIT, [this](const Event &e) { onEvent(e); })});
     m_subscriptions.push_back(
         {EventType::GOAL_SCORED,
-         em.subscribe(EventType::GOAL_SCORED,
-                      [this](const Event &e) { onEvent(e); })});
+         em.subscribe(EventType::GOAL_SCORED, [this](const Event &e) { onEvent(e); })});
     m_subscriptions.push_back(
         {EventType::GAME_PAUSED,
-         em.subscribe(EventType::GAME_PAUSED,
-                      [this](const Event &e) { onEvent(e); })});
+         em.subscribe(EventType::GAME_PAUSED, [this](const Event &e) { onEvent(e); })});
     m_subscriptions.push_back(
         {EventType::GAME_RESUMED,
-         em.subscribe(EventType::GAME_RESUMED,
-                      [this](const Event &e) { onEvent(e); })});
+         em.subscribe(EventType::GAME_RESUMED, [this](const Event &e) { onEvent(e); })});
 }
 
 AudioManager::~AudioManager() {
@@ -49,7 +44,7 @@ bool AudioManager::playBackgroundMusic(const std::string &path, float volume) {
     if (path.empty()) {
         return false;
     }
-    // Don't restart if already playing the same file
+    // Don't restart if already playing
     if (m_music.getStatus() == sf::SoundSource::Status::Playing) {
         return true;
     }
@@ -78,7 +73,7 @@ void AudioManager::resumeBackgroundMusic() {
 void AudioManager::playSoundEffect(const std::string &name, float volume) {
     const auto *buffer = ResourceManager::instance().getSoundBuffer(name);
     if (!buffer) {
-        return; // Not loaded; fail silently to avoid crashes
+        return; // Not loaded
     }
     auto it = m_sounds.find(name);
     if (it == m_sounds.end()) {

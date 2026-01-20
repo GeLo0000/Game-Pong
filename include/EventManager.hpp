@@ -5,13 +5,7 @@
 #include <vector>
 
 // Types of game events
-enum class EventType {
-    PADDLE_HIT,
-    WALL_HIT,
-    GOAL_SCORED,
-    GAME_PAUSED,
-    GAME_RESUMED
-};
+enum class EventType { PADDLE_HIT, WALL_HIT, GOAL_SCORED, GAME_PAUSED, GAME_RESUMED };
 
 // Event data container
 struct Event {
@@ -40,7 +34,6 @@ class EventManager {
     EventManager(const EventManager &) = delete;
     EventManager &operator=(const EventManager &) = delete;
 
-    std::unordered_map<EventType, std::vector<std::pair<std::size_t, Callback>>>
-        m_listeners;
+    std::unordered_map<EventType, std::vector<std::pair<std::size_t, Callback>>> m_listeners;
     std::size_t m_nextId{1};
 };

@@ -50,9 +50,9 @@ void Paddle::updateAI(float ballY, float deltaTime) {
     const float targetY = ballY;
 
     // Move toward target precisely
-    if (targetY < paddleCenterY) {
+    if (targetY < paddleCenterY - 10.f) {
         moveUp();
-    } else if (targetY > paddleCenterY) {
+    } else if (targetY > paddleCenterY + 10.f) {
         moveDown();
     }
 

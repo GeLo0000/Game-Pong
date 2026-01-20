@@ -26,7 +26,6 @@ class Game {
 
     // Initialization methods
     void initializeManagers();
-    void setupEventListeners();
     void loadResources();
     void createGameObjects();
     void initializeComponents();

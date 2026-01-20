@@ -4,8 +4,7 @@
 #include "EventManager.hpp"
 #include "Paddle.hpp"
 
-void CollisionHandler::handleCollisions(Ball &ball, Paddle &leftPaddle,
-                                        Paddle &rightPaddle,
+void CollisionHandler::handleCollisions(Ball &ball, Paddle &leftPaddle, Paddle &rightPaddle,
                                         const sf::Vector2f &windowSize) {
     handleWallCollision(ball, windowSize);
     handleGoal(ball, windowSize);
@@ -13,8 +12,7 @@ void CollisionHandler::handleCollisions(Ball &ball, Paddle &leftPaddle,
     handlePaddleCollision(ball, rightPaddle);
 }
 
-void CollisionHandler::handleWallCollision(Ball &ball,
-                                           const sf::Vector2f &windowSize) {
+void CollisionHandler::handleWallCollision(Ball &ball, const sf::Vector2f &windowSize) {
     auto ballBounds = ball.getBounds();
     const auto velocity = ball.getVelocity();
 
@@ -34,8 +32,7 @@ void CollisionHandler::handleWallCollision(Ball &ball,
     }
 }
 
-void CollisionHandler::handleGoal(Ball &ball,
-                                  const sf::Vector2f &windowSize) {
+void CollisionHandler::handleGoal(Ball &ball, const sf::Vector2f &windowSize) {
     auto ballBounds = ball.getBounds();
 
     // Left goal (right player scored)
