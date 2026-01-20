@@ -26,7 +26,6 @@ class AudioManager {
     AudioManager &operator=(const AudioManager &) = delete;
 
     void onEvent(const Event &event);
-    void ensureSound(const std::string &name, const std::string &path);
 
     sf::Music m_music;
     std::unordered_map<std::string, sf::Sound> m_sounds;

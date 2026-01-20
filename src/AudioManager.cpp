@@ -93,14 +93,6 @@ void AudioManager::playSoundEffect(const std::string &name, float volume) {
     }
 }
 
-void AudioManager::ensureSound(const std::string &name,
-                               const std::string &path) {
-    if (ResourceManager::instance().getSoundBuffer(name)) {
-        return;
-    }
-    ResourceManager::instance().loadSoundBuffer(name, path);
-}
-
 void AudioManager::onEvent(const Event &event) {
     switch (event.type) {
     case EventType::PADDLE_HIT:

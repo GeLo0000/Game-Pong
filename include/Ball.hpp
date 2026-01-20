@@ -16,10 +16,13 @@ class Ball : public IGameObject {
     void setVelocity(float vx, float vy);
     sf::Vector2f getVelocity() const;
     void setPosition(sf::Vector2f position);
+    void increaseSpeed();
 
   private:
     sf::CircleShape m_shape;
     sf::Vector2f m_velocity;
     float m_windowWidth;
     float m_windowHeight;
+    float m_speedMultiplier;
+    float m_maxSpeed;
 };

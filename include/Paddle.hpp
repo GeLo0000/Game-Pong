@@ -7,7 +7,7 @@
 class Paddle : public IGameObject {
   public:
     Paddle(float x, float y, float width, float height, float windowHeight,
-           bool isAI = false, bool invincible = false);
+           bool isAI = false);
 
     void update(float deltaTime) override;
     void updateAI(float ballY, float deltaTime); // AI movement logic
@@ -23,9 +23,7 @@ class Paddle : public IGameObject {
   private:
     sf::RectangleShape m_shape;
     float m_moveSpeed;
-    float m_velocityY;     // Current vertical velocity
-    float m_windowHeight;  // Screen height for clamping
-    bool m_isAI;           // AI-controlled flag
-    bool m_invincible;     // Perfect AI (no mistakes)
-    float m_aiErrorMargin; // AI tracking offset for difficulty
+    float m_velocityY;    // Current vertical velocity
+    float m_windowHeight; // Screen height for clamping
+    bool m_isAI;          // AI-controlled flag
 };
