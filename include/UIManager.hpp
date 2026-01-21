@@ -11,7 +11,6 @@ class UIManager {
   public:
     UIManager(float windowWidth, float windowHeight);
 
-    void loadFont(const sf::Font *font);
     void renderMenu(sf::RenderWindow &window);
     void renderGameUI(sf::RenderWindow &window, sf::Vector2f ballVelocity);
     void renderPause(sf::RenderWindow &window);
@@ -28,8 +27,8 @@ class UIManager {
 
     // Game UI canvas
     std::unique_ptr<UICanvas> m_gameCanvas;
-    UILabel *m_scoreLabel;  // Non-owning pointer
-    UILabel *m_speedLabel;  // Non-owning pointer
+    UILabel *m_scoreLabel; // Non-owning pointer
+    UILabel *m_speedLabel; // Non-owning pointer
 
     // Main menu canvas
     std::unique_ptr<UICanvas> m_menuCanvas;

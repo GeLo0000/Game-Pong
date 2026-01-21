@@ -5,7 +5,23 @@
 #include <vector>
 
 // Types of game events
-enum class EventType { PADDLE_HIT, WALL_HIT, GOAL_SCORED, GAME_PAUSED, GAME_RESUMED };
+enum class EventType {
+    // Game events
+    PADDLE_HIT,
+    WALL_HIT,
+    GOAL_SCORED,
+    GAME_PAUSED,
+    GAME_RESUMED,
+
+    // Input events
+    INPUT_START_PVP,
+    INPUT_START_PVAI,
+    INPUT_PAUSE,
+    INPUT_RESUME,
+    INPUT_RESTART,
+    INPUT_BACK_TO_MENU,
+    INPUT_CLOSE_GAME
+};
 
 // Event data container
 struct Event {

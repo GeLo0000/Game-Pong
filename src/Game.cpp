@@ -19,6 +19,7 @@ Game::Game()
 
     createGameObjects();
     initializeComponents();
+    subscribeToEvents();
 }
 
 Game::~Game() = default;
@@ -64,22 +65,7 @@ void Game::processEvents() {
         if (ev->is<sf::Event::Closed>()) {
             m_window.close();
         } else if (const auto *kp = ev->getIf<sf::Event::KeyPressed>()) {
-            // Global close key
-            if (m_inputHandler->handleCloseGameKey(*kp)) {
-                m_window.close();
-            }
-            // Menu input handling
-            if (m_currentState == GameState::MENU) {
-                if (m_inputHandler->handleMenuInput(*kp, *m_ball)) {
-                    m_currentState = GameState::PLAYING;
-                    AudioManager::instance().playBackgroundMusic("assets/audio/background.ogg");
-                }
-                continue;
-            }
-            // Gameplay input handling (pause/resume, restart, menu)
-            if (m_currentState == GameState::PAUSED || m_currentState == GameState::PLAYING) {
-                m_inputHandler->handleGameplayKeyPress(*kp, m_currentState, *m_ball);
-            }
+            m_inputHandler->handleKeyPress(*kp, m_currentState);
         }
     }
 }
@@ -136,4 +122,69 @@ void Game::render() {
 void Game::handleCollisions() {
     m_collisionHandler->handleCollisions(*m_ball, *m_leftPaddle, *m_rightPaddle,
                                          {m_windowWidth, m_windowHeight});
+}
+
+// Subscribe to input events
+void Game::subscribeToEvents() {
+    auto &eventMgr = EventManager::instance();
+
+    eventMgr.subscribe(EventType::INPUT_START_PVP, [this](const Event &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_START_PVAI, [this](const Event &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_PAUSE, [this](const Event &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_RESUME, [this](const Event &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_RESTART, [this](const Event &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_BACK_TO_MENU, [this](const Event &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_CLOSE_GAME, [this](const Event &e) { onInputEvent(e); });
+}
+
+// Handle input events
+void Game::onInputEvent(const Event &event) {
+    switch (event.type) {
+    case EventType::INPUT_START_PVP:
+        GameModeManager::instance().selectMode(ModeType::PvP);
+        ScoreManager::instance().reset();
+        m_ball->reset();
+        m_currentState = GameState::PLAYING;
+        AudioManager::instance().playBackgroundMusic("assets/audio/background.ogg");
+        break;
+
+    case EventType::INPUT_START_PVAI:
+        GameModeManager::instance().selectMode(ModeType::PvAI);
+        ScoreManager::instance().reset();
+        m_ball->reset();
+        m_currentState = GameState::PLAYING;
+        AudioManager::instance().playBackgroundMusic("assets/audio/background.ogg");
+        break;
+
+    case EventType::INPUT_PAUSE:
+        m_currentState = GameState::PAUSED;
+        EventManager::instance().emit({EventType::GAME_PAUSED, "paused"});
+        break;
+
+    case EventType::INPUT_RESUME:
+        m_currentState = GameState::PLAYING;
+        EventManager::instance().emit({EventType::GAME_RESUMED, "resumed"});
+        break;
+
+    case EventType::INPUT_RESTART:
+        ScoreManager::instance().reset();
+        m_ball->reset();
+        m_currentState = GameState::PLAYING;
+        EventManager::instance().emit({EventType::GAME_RESUMED, "restarted"});
+        break;
+
+    case EventType::INPUT_BACK_TO_MENU:
+        ScoreManager::instance().reset();
+        m_ball->reset();
+        m_currentState = GameState::MENU;
+        EventManager::instance().emit({EventType::GAME_PAUSED, "menu"});
+        break;
+
+    case EventType::INPUT_CLOSE_GAME:
+        m_window.close();
+        break;
+
+    default:
+        break;
+    }
 }

@@ -27,6 +27,10 @@ class Game {
     // Initialization methods
     void createGameObjects();
     void initializeComponents();
+    void subscribeToEvents();
+
+    // Event handlers
+    void onInputEvent(const Event &event);
 
   private:
     // Window dimensions

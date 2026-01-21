@@ -2,67 +2,44 @@
 
 #include "Game.hpp"
 
-bool InputHandler::handleCloseGameKey(const sf::Event::KeyPressed &key) {
-    // Escape key closes the game
+void InputHandler::handleKeyPress(const sf::Event::KeyPressed &key, GameState currentState) {
+    auto &eventMgr = EventManager::instance();
+
+    // Global key: Escape closes the game
     if (key.scancode == sf::Keyboard::Scancode::Escape) {
-        return true;
-    }
-    return false;
-}
-
-bool InputHandler::handleMenuInput(const sf::Event::KeyPressed &key, Ball &ball) {
-    // Map keys 1 and 2 (or numpad) to modes
-    std::optional<ModeType> mode;
-
-    if (key.scancode == sf::Keyboard::Scancode::Num1 ||
-        key.scancode == sf::Keyboard::Scancode::Numpad1) {
-        mode = ModeType::PvP;
-    } else if (key.scancode == sf::Keyboard::Scancode::Num2 ||
-               key.scancode == sf::Keyboard::Scancode::Numpad2) {
-        mode = ModeType::PvAI;
+        eventMgr.emit({EventType::INPUT_CLOSE_GAME, "escape"});
+        return;
     }
 
-    if (mode.has_value()) {
-        GameModeManager::instance().selectMode(mode.value());
-        ScoreManager::instance().reset();
-        ball.reset();
-        return true; // Start game
-    }
-
-    return false;
-}
-
-bool InputHandler::handleGameplayKeyPress(const sf::Event::KeyPressed &key, GameState &state,
-                                          Ball &ball) {
-    // Space: toggle pause/resume
-    if (key.scancode == sf::Keyboard::Scancode::Space) {
-        if (state == GameState::PLAYING) {
-            state = GameState::PAUSED;
-            EventManager::instance().emit({EventType::GAME_PAUSED, "paused"});
-        } else if (state == GameState::PAUSED) {
-            state = GameState::PLAYING;
-            EventManager::instance().emit({EventType::GAME_RESUMED, "resumed"});
+    // Menu state: handle mode selection
+    if (currentState == GameState::MENU) {
+        if (key.scancode == sf::Keyboard::Scancode::Num1 ||
+            key.scancode == sf::Keyboard::Scancode::Numpad1) {
+            eventMgr.emit({EventType::INPUT_START_PVP, "pvp"});
+        } else if (key.scancode == sf::Keyboard::Scancode::Num2 ||
+                   key.scancode == sf::Keyboard::Scancode::Numpad2) {
+            eventMgr.emit({EventType::INPUT_START_PVAI, "pvai"});
         }
-        return false;
+        return;
     }
 
-    // R: restart round (reset score and ball, continue playing)
-    if (key.scancode == sf::Keyboard::Scancode::R) {
-        ScoreManager::instance().reset();
-        ball.reset();
-        state = GameState::PLAYING;
-        EventManager::instance().emit({EventType::GAME_RESUMED, "restarted"});
-        return false;
+    // Playing/Paused state: handle gameplay keys
+    if (currentState == GameState::PLAYING || currentState == GameState::PAUSED) {
+        // Space: toggle pause/resume
+        if (key.scancode == sf::Keyboard::Scancode::Space) {
+            if (currentState == GameState::PLAYING) {
+                eventMgr.emit({EventType::INPUT_PAUSE, "pause"});
+            } else if (currentState == GameState::PAUSED) {
+                eventMgr.emit({EventType::INPUT_RESUME, "resume"});
+            }
+        }
+        // R: restart round
+        else if (key.scancode == sf::Keyboard::Scancode::R) {
+            eventMgr.emit({EventType::INPUT_RESTART, "restart"});
+        }
+        // M: back to main menu
+        else if (key.scancode == sf::Keyboard::Scancode::M) {
+            eventMgr.emit({EventType::INPUT_BACK_TO_MENU, "menu"});
+        }
     }
-
-    // M: back to main menu
-    if (key.scancode == sf::Keyboard::Scancode::M) {
-        ScoreManager::instance().reset();
-        ball.reset();
-        state = GameState::MENU;
-        EventManager::instance().emit({EventType::GAME_PAUSED, "menu"});
-        return false;
-    }
-
-    return false;
 }
