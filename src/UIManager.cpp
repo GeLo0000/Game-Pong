@@ -1,48 +1,76 @@
 #include "UIManager.hpp"
+#include "ResourceManager.hpp"
 #include "ScoreManager.hpp"
 
 #include <cmath>
 #include <string>
 
 UIManager::UIManager(float windowWidth, float windowHeight)
-    : m_windowWidth(windowWidth), m_windowHeight(windowHeight) {}
+    : m_windowWidth(windowWidth), m_windowHeight(windowHeight), m_font(nullptr),
+      m_scoreLabel(nullptr), m_speedLabel(nullptr) {
+    // Load main font
+    ResourceManager::instance().loadFont("main_font", "assets/fonts/Roboto-Regular.ttf");
+    m_font = ResourceManager::instance().getFont("main_font");
 
-void UIManager::loadFont(const sf::Font *font) {
-    if (!font) {
+    createGameUI();
+    createMenuCanvas();
+    createPauseCanvas();
+}
+
+void UIManager::createGameUI() {
+    if (!m_font) {
         return;
     }
 
-    // Score text
-    m_scoreText = sf::Text(*font);
-    m_scoreText->setCharacterSize(30);
-    m_scoreText->setFillColor(sf::Color::White);
-    m_scoreText->setPosition({m_windowWidth / 2.0f - 50.0f, 20.0f});
+    // Create game canvas (full screen, transparent)
+    m_gameCanvas = std::make_unique<UICanvas>(sf::Vector2f{0.0f, 0.0f},
+                                              sf::Vector2f{m_windowWidth, m_windowHeight});
+    m_gameCanvas->setBackgroundColor(sf::Color::Transparent);
 
-    // Speed text
-    m_speedText = sf::Text(*font);
-    m_speedText->setCharacterSize(20);
-    m_speedText->setFillColor(sf::Color(150, 150, 150));
-    m_speedText->setPosition({m_windowWidth / 2.0f - 60.0f, m_windowHeight - 40.0f});
+    // Score label
+    auto scoreLabel = std::make_unique<UILabel>(sf::Vector2f{m_windowWidth / 2.0f - 50.0f, 20.0f},
+                                                "0 : 0", *m_font);
+    scoreLabel->setTextSize(30);
+    scoreLabel->setTextColor(sf::Color::White);
+    m_scoreLabel = scoreLabel.get();
+    m_gameCanvas->addElement(std::move(scoreLabel));
 
-    // Main menu title
-    m_titleText = sf::Text(*font);
-    m_titleText->setString("Pong");
-    m_titleText->setCharacterSize(80);
-    m_titleText->setFillColor(sf::Color::White);
-    m_titleText->setPosition({m_windowWidth / 2.0f - 100.0f, 80.0f});
-
-    // Exit hint
-    m_exitHintText = sf::Text(*font);
-    m_exitHintText->setString(" Esc - Exit\n Space - Pause\n R - Restart\n M - Menu");
-    m_exitHintText->setCharacterSize(18);
-    m_exitHintText->setFillColor(sf::Color(200, 200, 200));
-    m_exitHintText->setPosition({20.0f, 20.0f});
-
-    createMenuButtons();
-    createPauseMenu();
+    // Speed label
+    auto speedLabel = std::make_unique<UILabel>(
+        sf::Vector2f{m_windowWidth / 2.0f - 60.0f, m_windowHeight - 40.0f}, "Ball Speed: 0",
+        *m_font);
+    speedLabel->setTextSize(20);
+    speedLabel->setTextColor(sf::Color(150, 150, 150));
+    m_speedLabel = speedLabel.get();
+    m_gameCanvas->addElement(std::move(speedLabel));
 }
 
-void UIManager::createMenuButtons() {
+void UIManager::createMenuCanvas() {
+    if (!m_font) {
+        return;
+    }
+
+    // Create menu canvas (full screen, transparent)
+    m_menuCanvas = std::make_unique<UICanvas>(sf::Vector2f{0.0f, 0.0f},
+                                              sf::Vector2f{m_windowWidth, m_windowHeight});
+    m_menuCanvas->setBackgroundColor(sf::Color::Transparent);
+
+    // Title label
+    auto titleLabel = std::make_unique<UILabel>(sf::Vector2f{m_windowWidth / 2.0f - 100.0f, 80.0f},
+                                                "Pong", *m_font);
+    titleLabel->setTextSize(80);
+    titleLabel->setTextColor(sf::Color::White);
+    m_menuCanvas->addElement(std::move(titleLabel));
+
+    // Exit hint label
+    auto exitHintLabel =
+        std::make_unique<UILabel>(sf::Vector2f{20.0f, 20.0f},
+                                  " Esc - Exit\n Space - Pause\n R - Restart\n M - Menu", *m_font);
+    exitHintLabel->setTextSize(18);
+    exitHintLabel->setTextColor(sf::Color(200, 200, 200));
+    m_menuCanvas->addElement(std::move(exitHintLabel));
+
+    // Menu buttons
     const float buttonWidth = 200.0f;
     const float buttonHeight = 120.0f;
     const float spacing = 100.0f;
@@ -50,55 +78,49 @@ void UIManager::createMenuButtons() {
     const float centerX = m_windowWidth / 2.0f;
 
     // PvP button
-    sf::RectangleShape pvpButton({buttonWidth, buttonHeight});
-    pvpButton.setPosition({centerX - buttonWidth - spacing / 2.0f, startY});
-    pvpButton.setFillColor(sf::Color::Transparent);
-    pvpButton.setOutlineColor(sf::Color::White);
-    pvpButton.setOutlineThickness(3.0f);
-    m_menuButtons.push_back(pvpButton);
-
-    sf::Text pvpText(m_scoreText->getFont());
-    pvpText.setString("Player vs Player\n    (Press '1')");
-    pvpText.setCharacterSize(24);
-    pvpText.setFillColor(sf::Color::White);
-    centerTextInButton(pvpText, pvpButton);
-    m_menuButtonTexts.push_back(pvpText);
+    auto pvpButton = std::make_unique<UIButton>(
+        sf::Vector2f{centerX - buttonWidth - spacing / 2.0f, startY},
+        sf::Vector2f{buttonWidth, buttonHeight}, "Player vs Player\n    (Press '1')", *m_font);
+    pvpButton->setTextSize(24);
+    pvpButton->setBackgroundColor(sf::Color::Transparent);
+    pvpButton->setOutlineColor(sf::Color::White);
+    pvpButton->setOutlineThickness(3.0f);
+    m_menuCanvas->addElement(std::move(pvpButton));
 
     // PvAI button
-    sf::RectangleShape pvaiButton({buttonWidth, buttonHeight});
-    pvaiButton.setPosition({centerX + spacing / 2.0f, startY});
-    pvaiButton.setFillColor(sf::Color::Transparent);
-    pvaiButton.setOutlineColor(sf::Color::White);
-    pvaiButton.setOutlineThickness(3.0f);
-    m_menuButtons.push_back(pvaiButton);
-
-    sf::Text pvaiText(m_scoreText->getFont());
-    pvaiText.setString("Player vs Bot\n  (Press '2')");
-    pvaiText.setCharacterSize(24);
-    pvaiText.setFillColor(sf::Color::White);
-    centerTextInButton(pvaiText, pvaiButton);
-    m_menuButtonTexts.push_back(pvaiText);
+    auto pvaiButton = std::make_unique<UIButton>(sf::Vector2f{centerX + spacing / 2.0f, startY},
+                                                 sf::Vector2f{buttonWidth, buttonHeight},
+                                                 "Player vs Bot\n  (Press '2')", *m_font);
+    pvaiButton->setTextSize(24);
+    pvaiButton->setBackgroundColor(sf::Color::Transparent);
+    pvaiButton->setOutlineColor(sf::Color::White);
+    pvaiButton->setOutlineThickness(3.0f);
+    m_menuCanvas->addElement(std::move(pvaiButton));
 }
 
-void UIManager::createPauseMenu() {
-    // Gray overlay
+void UIManager::createPauseCanvas() {
+    if (!m_font) {
+        return;
+    }
+
+    // Gray overlay as canvas background
     const float overlayWidth = 600.0f;
     const float overlayHeight = 200.0f;
     const float overlayX = m_windowWidth / 2.0f - overlayWidth / 2.0f;
     const float overlayY = m_windowHeight / 2.0f - overlayHeight / 2.0f;
 
-    m_pauseOverlay = sf::RectangleShape({overlayWidth, overlayHeight});
-    m_pauseOverlay->setPosition({overlayX, overlayY});
-    m_pauseOverlay->setFillColor(sf::Color(80, 80, 80));
-    m_pauseOverlay->setOutlineColor(sf::Color::Black);
-    m_pauseOverlay->setOutlineThickness(3.0f);
+    m_pauseCanvas = std::make_unique<UICanvas>(sf::Vector2f{overlayX, overlayY},
+                                               sf::Vector2f{overlayWidth, overlayHeight});
+    m_pauseCanvas->setBackgroundColor(sf::Color(80, 80, 80));
+    m_pauseCanvas->setOutlineColor(sf::Color::Black);
+    m_pauseCanvas->setOutlineThickness(3.0f);
 
     // Pause title
-    m_pauseTitle = sf::Text(m_scoreText->getFont());
-    m_pauseTitle->setString("Paused");
-    m_pauseTitle->setCharacterSize(36);
-    m_pauseTitle->setFillColor(sf::Color::White);
-    m_pauseTitle->setPosition({m_windowWidth / 2.0f - 60.0f, overlayY + 20.0f});
+    auto pauseTitle = std::make_unique<UILabel>(
+        sf::Vector2f{m_windowWidth / 2.0f - 60.0f, overlayY + 20.0f}, "Paused", *m_font);
+    pauseTitle->setTextSize(36);
+    pauseTitle->setTextColor(sf::Color::White);
+    m_pauseCanvas->addElement(std::move(pauseTitle));
 
     // Pause buttons
     const float btnWidth = 135.0f;
@@ -111,81 +133,45 @@ void UIManager::createPauseMenu() {
                                              "Exit (Esc)"};
 
     for (size_t i = 0; i < buttonLabels.size(); ++i) {
-        sf::RectangleShape btn({btnWidth, btnHeight});
-        btn.setPosition({btnStartX + i * (btnWidth + btnSpacing), btnY});
-        btn.setFillColor(sf::Color(50, 50, 50));
-        btn.setOutlineColor(sf::Color::Black);
-        btn.setOutlineThickness(2.0f);
-        m_pauseButtons.push_back(btn);
-
-        sf::Text btnText(m_scoreText->getFont());
-        btnText.setString(buttonLabels[i]);
-        btnText.setCharacterSize(15);
-        btnText.setFillColor(sf::Color::White);
-        centerTextInButton(btnText, btn);
-        m_pauseButtonTexts.push_back(btnText);
+        auto btn =
+            std::make_unique<UIButton>(sf::Vector2f{btnStartX + i * (btnWidth + btnSpacing), btnY},
+                                       sf::Vector2f{btnWidth, btnHeight}, buttonLabels[i], *m_font);
+        btn->setTextSize(15);
+        btn->setBackgroundColor(sf::Color(50, 50, 50));
+        btn->setOutlineColor(sf::Color::Black);
+        btn->setOutlineThickness(2.0f);
+        m_pauseCanvas->addElement(std::move(btn));
     }
 }
 
 void UIManager::renderMenu(sf::RenderWindow &window) {
-    // Draw title
-    if (m_titleText) {
-        window.draw(*m_titleText);
-    }
-
-    // Draw exit hint
-    if (m_exitHintText) {
-        window.draw(*m_exitHintText);
-    }
-
-    // Draw menu buttons
-    for (const auto &button : m_menuButtons) {
-        window.draw(button);
-    }
-    for (const auto &text : m_menuButtonTexts) {
-        window.draw(text);
+    if (m_menuCanvas) {
+        m_menuCanvas->draw(window);
     }
 }
 
 void UIManager::renderGameUI(sf::RenderWindow &window, sf::Vector2f ballVelocity) {
-    // Display score
+    // Update score
     const int leftScore = ScoreManager::instance().getLeftScore();
     const int rightScore = ScoreManager::instance().getRightScore();
-    if (m_scoreText) {
-        m_scoreText->setString(std::to_string(leftScore) + " : " + std::to_string(rightScore));
-        window.draw(*m_scoreText);
+    if (m_scoreLabel) {
+        m_scoreLabel->setText(std::to_string(leftScore) + " : " + std::to_string(rightScore));
     }
 
-    // Calculate and display ball speed
-    if (m_speedText) {
+    // Calculate and update ball speed
+    if (m_speedLabel) {
         float speed = std::sqrt(ballVelocity.x * ballVelocity.x + ballVelocity.y * ballVelocity.y);
-        m_speedText->setString("Ball Speed: " + std::to_string(static_cast<int>(speed)));
-        window.draw(*m_speedText);
+        m_speedLabel->setText("Ball Speed: " + std::to_string(static_cast<int>(speed)));
+    }
+
+    // Draw game canvas
+    if (m_gameCanvas) {
+        m_gameCanvas->draw(window);
     }
 }
 
 void UIManager::renderPause(sf::RenderWindow &window) {
-    // Draw gray overlay
-    if (m_pauseOverlay) {
-        window.draw(*m_pauseOverlay);
+    if (m_pauseCanvas) {
+        m_pauseCanvas->draw(window);
     }
-
-    // Draw pause title
-    if (m_pauseTitle) {
-        window.draw(*m_pauseTitle);
-    }
-
-    // Draw pause buttons
-    for (const auto &button : m_pauseButtons) {
-        window.draw(button);
-    }
-    for (const auto &text : m_pauseButtonTexts) {
-        window.draw(text);
-    }
-}
-
-void UIManager::centerTextInButton(sf::Text &text, const sf::RectangleShape &button) {
-    auto bounds = text.getLocalBounds();
-    text.setPosition({button.getPosition().x + (button.getSize().x - bounds.size.x) / 2.0f,
-                      button.getPosition().y + (button.getSize().y - bounds.size.y) / 2.0f});
 }

@@ -17,6 +17,9 @@ set(SOURCES
     src/UIManager.cpp
     src/InputHandler.cpp
     src/CollisionHandler.cpp
+    src/UIButton.cpp
+    src/UILabel.cpp
+    src/UICanvas.cpp
 )
 
 set(HEADERS
@@ -33,6 +36,10 @@ set(HEADERS
     include/UIManager.hpp
     include/InputHandler.hpp
     include/CollisionHandler.hpp
+    include/IUIElement.hpp
+    include/UIButton.hpp
+    include/UILabel.hpp
+    include/UICanvas.hpp
 )
 
 include(FetchContent)

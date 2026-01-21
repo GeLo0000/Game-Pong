@@ -42,10 +42,8 @@ void Game::createGameObjects() {
 
 // Initialize component managers
 void Game::initializeComponents() {
-    ResourceManager::instance().loadFont("main_font", "assets/fonts/Roboto-Regular.ttf");
     AudioManager::instance();
     m_uiManager = std::make_unique<UIManager>(m_windowWidth, m_windowHeight);
-    m_uiManager->loadFont(ResourceManager::instance().getFont("main_font"));
     m_inputHandler = std::make_unique<InputHandler>();
     m_collisionHandler = std::make_unique<CollisionHandler>();
 }

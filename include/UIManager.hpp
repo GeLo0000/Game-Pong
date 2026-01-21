@@ -1,9 +1,10 @@
 #pragma once
 
+#include "UIButton.hpp"
+#include "UICanvas.hpp"
+#include "UILabel.hpp"
 #include <SFML/Graphics.hpp>
 #include <memory>
-#include <optional>
-#include <vector>
 
 // Manages all UI rendering and state
 class UIManager {
@@ -16,26 +17,23 @@ class UIManager {
     void renderPause(sf::RenderWindow &window);
 
   private:
-    void createMenuButtons();
-    void createPauseMenu();
-    void centerTextInButton(sf::Text &text, const sf::RectangleShape &button);
+    void createGameUI();
+    void createMenuCanvas();
+    void createPauseCanvas();
 
     float m_windowWidth;
     float m_windowHeight;
 
-    // Game UI
-    std::optional<sf::Text> m_scoreText;
-    std::optional<sf::Text> m_speedText;
+    const sf::Font *m_font;
 
-    // Main menu
-    std::optional<sf::Text> m_titleText;
-    std::optional<sf::Text> m_exitHintText;
-    std::vector<sf::RectangleShape> m_menuButtons;
-    std::vector<sf::Text> m_menuButtonTexts;
+    // Game UI canvas
+    std::unique_ptr<UICanvas> m_gameCanvas;
+    UILabel *m_scoreLabel;  // Non-owning pointer
+    UILabel *m_speedLabel;  // Non-owning pointer
 
-    // Pause menu
-    std::optional<sf::RectangleShape> m_pauseOverlay;
-    std::optional<sf::Text> m_pauseTitle;
-    std::vector<sf::RectangleShape> m_pauseButtons;
-    std::vector<sf::Text> m_pauseButtonTexts;
+    // Main menu canvas
+    std::unique_ptr<UICanvas> m_menuCanvas;
+
+    // Pause menu canvas
+    std::unique_ptr<UICanvas> m_pauseCanvas;
 };
