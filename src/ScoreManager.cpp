@@ -7,7 +7,6 @@ ScoreManager &ScoreManager::instance() {
 }
 
 ScoreManager::ScoreManager() : m_leftScore(0), m_rightScore(0) {
-    // Subscribe to GOAL_SCORED events
     m_subscriptionId = EventManager::instance().subscribe(
         EventType::GOAL_SCORED, [this](const Event &e) { onGoalScored(e); });
 }
@@ -25,7 +24,6 @@ void ScoreManager::reset() {
     m_rightScore = 0;
 }
 
-// Determine which side scored based on event info
 void ScoreManager::onGoalScored(const Event &event) {
     if (std::strcmp(event.info, "right wall") == 0) {
         addLeftScore();

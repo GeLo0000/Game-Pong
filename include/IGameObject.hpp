@@ -2,7 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 
-// Abstract base class for all game objects
 class IGameObject {
   public:
     virtual ~IGameObject() = default;

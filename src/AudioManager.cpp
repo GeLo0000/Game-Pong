@@ -8,13 +8,11 @@ AudioManager &AudioManager::instance() {
 }
 
 AudioManager::AudioManager() {
-    // Preload all sound buffers to avoid first-play delay
     auto &rm = ResourceManager::instance();
     rm.loadSoundBuffer("paddle_hit", "assets/audio/paddle_hit.ogg");
     rm.loadSoundBuffer("wall_hit", "assets/audio/wall_hit.ogg");
     rm.loadSoundBuffer("goal", "assets/audio/goal.ogg");
 
-    // Subscribe to events we need
     auto &em = EventManager::instance();
     m_subscriptions.push_back(
         {EventType::PADDLE_HIT,
@@ -44,7 +42,6 @@ bool AudioManager::playBackgroundMusic(const std::string &path, float volume) {
     if (path.empty()) {
         return false;
     }
-    // Don't restart if already playing
     if (m_music.getStatus() == sf::SoundSource::Status::Playing) {
         return true;
     }
@@ -73,11 +70,10 @@ void AudioManager::resumeBackgroundMusic() {
 void AudioManager::playSoundEffect(const std::string &name, float volume) {
     const auto *buffer = ResourceManager::instance().getSoundBuffer(name);
     if (!buffer) {
-        return; // Not loaded
+        return;
     }
     auto it = m_sounds.find(name);
     if (it == m_sounds.end()) {
-        // Create sound in map first, then play
         auto [iter, inserted] = m_sounds.try_emplace(name, *buffer);
         iter->second.setVolume(volume);
         iter->second.play();

@@ -4,7 +4,6 @@
 #include "Paddle.hpp"
 #include <memory>
 
-// Factory for creating game objects
 class GameObjectFactory {
   public:
     static GameObjectFactory &instance();

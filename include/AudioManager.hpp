@@ -7,7 +7,6 @@
 #include <unordered_map>
 #include <vector>
 
-// Manages music and sound effects, reacting to emitted events.
 class AudioManager {
   public:
     static AudioManager &instance();

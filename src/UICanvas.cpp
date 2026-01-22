@@ -21,10 +21,8 @@ void UICanvas::draw(sf::RenderWindow &window) const {
         return;
     }
 
-    // Draw background
     window.draw(m_background);
 
-    // Draw all elements
     for (const auto &element : m_elements) {
         if (element) {
             element->draw(window);

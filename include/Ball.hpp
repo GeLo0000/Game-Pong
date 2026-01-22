@@ -3,7 +3,6 @@
 #include "IGameObject.hpp"
 #include <SFML/Graphics.hpp>
 
-// Game ball that bounces between paddles
 class Ball : public IGameObject {
   public:
     Ball(float x, float y, float radius, float windowWidth, float windowHeight);

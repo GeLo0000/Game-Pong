@@ -8,10 +8,8 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
-// Game state enum
 enum class GameState { MENU, PLAYING, PAUSED };
 
-// Main game controller class
 class Game {
   public:
     Game();
@@ -24,32 +22,26 @@ class Game {
     void render();
     void handleCollisions();
 
-    // Initialization methods
     void createGameObjects();
     void initializeComponents();
     void subscribeToEvents();
 
-    // Event handlers
     void onInputEvent(const Event &event);
 
   private:
-    // Window dimensions
     float m_windowWidth;
     float m_windowHeight;
 
-    sf::RenderWindow m_window; // Main game window
-    sf::Clock m_clock;         // Clock for delta time tracking
+    sf::RenderWindow m_window;
+    sf::Clock m_clock;
 
-    // Game objects
     std::unique_ptr<Paddle> m_leftPaddle;
     std::unique_ptr<Paddle> m_rightPaddle;
     std::unique_ptr<Ball> m_ball;
 
-    // Manager objects
     std::unique_ptr<UIManager> m_uiManager;
     std::unique_ptr<InputHandler> m_inputHandler;
     std::unique_ptr<CollisionHandler> m_collisionHandler;
 
-    // Game state
     GameState m_currentState;
 };

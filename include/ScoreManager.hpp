@@ -2,7 +2,6 @@
 
 #include "EventManager.hpp"
 
-// Singleton score tracker that listens to GOAL_SCORED events
 class ScoreManager {
   public:
     static ScoreManager &instance();

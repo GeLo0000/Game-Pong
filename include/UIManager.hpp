@@ -25,14 +25,11 @@ class UIManager {
 
     const sf::Font *m_font;
 
-    // Game UI canvas
     std::unique_ptr<UICanvas> m_gameCanvas;
-    UILabel *m_scoreLabel; // Non-owning pointer
-    UILabel *m_speedLabel; // Non-owning pointer
+    UILabel *m_scoreLabel;
+    UILabel *m_speedLabel;
 
-    // Main menu canvas
     std::unique_ptr<UICanvas> m_menuCanvas;
 
-    // Pause menu canvas
     std::unique_ptr<UICanvas> m_pauseCanvas;
 };

@@ -23,14 +23,12 @@ void GameModeManager::selectMode(ModeType type) {
 GameMode *GameModeManager::currentMode() { return m_mode.get(); }
 
 void PvPMode::update(float deltaTime, Ball &ball, Paddle &left, Paddle &right) {
-    // Left paddle controls (W/S)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W)) {
         left.moveUp();
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S)) {
         left.moveDown();
     }
 
-    // Right paddle controls (Up/Down)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up)) {
         right.moveUp();
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down)) {

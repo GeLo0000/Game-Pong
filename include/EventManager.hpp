@@ -4,16 +4,13 @@
 #include <unordered_map>
 #include <vector>
 
-// Types of game events
 enum class EventType {
-    // Game events
     PADDLE_HIT,
     WALL_HIT,
     GOAL_SCORED,
     GAME_PAUSED,
     GAME_RESUMED,
 
-    // Input events
     INPUT_START_PVP,
     INPUT_START_PVAI,
     INPUT_PAUSE,
@@ -23,26 +20,21 @@ enum class EventType {
     INPUT_CLOSE_GAME
 };
 
-// Event data container
 struct Event {
     EventType type;
-    const char *info; // Optional short context string
+    const char *info;
 };
 
-// Singleton EventManager to broadcast events to subscribers
 class EventManager {
   public:
     using Callback = std::function<void(const Event &)>;
 
     static EventManager &instance();
 
-    // Subscribe to event type; returns subscription id
     std::size_t subscribe(EventType type, Callback cb);
 
-    // Unsubscribe by id
     void unsubscribe(EventType type, std::size_t id);
 
-    // Emit event to all subscribers
     void emit(const Event &event);
 
   private:

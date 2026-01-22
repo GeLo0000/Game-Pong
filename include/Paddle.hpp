@@ -9,7 +9,7 @@ class Paddle : public IGameObject {
     Paddle(float x, float y, float width, float height, float windowHeight, bool isAI = false);
 
     void update(float deltaTime) override;
-    void updateAI(float ballY, float deltaTime); // AI movement logic
+    void updateAI(float ballY, float deltaTime);
     void draw(sf::RenderTarget &target) override;
     sf::FloatRect getBounds() const override;
 
@@ -17,12 +17,10 @@ class Paddle : public IGameObject {
     void moveDown();
     void setPosition(sf::Vector2f position);
 
-    bool isAI() const;
-
   private:
     sf::RectangleShape m_shape;
     float m_moveSpeed;
-    float m_velocityY;    // Current vertical velocity
-    float m_windowHeight; // Screen height for clamping
-    bool m_isAI;          // AI-controlled flag
+    float m_velocityY;
+    float m_windowHeight;
+    bool m_isAI;
 };
