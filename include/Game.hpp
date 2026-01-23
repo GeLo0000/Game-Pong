@@ -27,7 +27,13 @@ class Game {
     void initializeComponents();
     void subscribeToEvents();
 
-    void onInputEvent(const EventType &event);
+    void onStartPvP();
+    void onStartPvAI();
+    void onPause();
+    void onResume();
+    void onRestart();
+    void onBackToMenu();
+    void onCloseGame();
 
   private:
     static constexpr float kWindowWidth = 800.0f;

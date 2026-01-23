@@ -108,59 +108,44 @@ void Game::handleCollisions() {
 void Game::subscribeToEvents() {
     auto &eventMgr = EventManager::instance();
 
-    eventMgr.subscribe(EventType::INPUT_START_PVP, [this](const EventType &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_START_PVAI,
-                       [this](const EventType &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_PAUSE, [this](const EventType &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_RESUME, [this](const EventType &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_RESTART, [this](const EventType &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_START_PVP, [this](const EventType &) { onStartPvP(); });
+    eventMgr.subscribe(EventType::INPUT_START_PVAI, [this](const EventType &) { onStartPvAI(); });
+    eventMgr.subscribe(EventType::INPUT_PAUSE, [this](const EventType &) { onPause(); });
+    eventMgr.subscribe(EventType::INPUT_RESUME, [this](const EventType &) { onResume(); });
+    eventMgr.subscribe(EventType::INPUT_RESTART, [this](const EventType &) { onRestart(); });
     eventMgr.subscribe(EventType::INPUT_BACK_TO_MENU,
-                       [this](const EventType &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_CLOSE_GAME,
-                       [this](const EventType &e) { onInputEvent(e); });
+                       [this](const EventType &) { onBackToMenu(); });
+    eventMgr.subscribe(EventType::INPUT_CLOSE_GAME, [this](const EventType &) { onCloseGame(); });
 }
 
-void Game::onInputEvent(const EventType &event) {
-    switch (event) {
-    case EventType::INPUT_START_PVP:
-        GameModeManager::instance().selectMode(ModeType::PvP);
-        ScoreManager::instance().reset();
-        m_ball->reset();
-        m_currentState = GameState::PLAYING;
-        break;
-
-    case EventType::INPUT_START_PVAI:
-        GameModeManager::instance().selectMode(ModeType::PvAI);
-        ScoreManager::instance().reset();
-        m_ball->reset();
-        m_currentState = GameState::PLAYING;
-        break;
-
-    case EventType::INPUT_PAUSE:
-        m_currentState = GameState::PAUSED;
-        break;
-
-    case EventType::INPUT_RESUME:
-        m_currentState = GameState::PLAYING;
-        break;
-
-    case EventType::INPUT_RESTART:
-        ScoreManager::instance().reset();
-        m_ball->reset();
-        m_currentState = GameState::PLAYING;
-        break;
-
-    case EventType::INPUT_BACK_TO_MENU:
-        ScoreManager::instance().reset();
-        m_ball->reset();
-        m_currentState = GameState::MENU;
-        break;
-
-    case EventType::INPUT_CLOSE_GAME:
-        m_window.close();
-        break;
-
-    default:
-        break;
-    }
+void Game::onStartPvP() {
+    GameModeManager::instance().selectMode(ModeType::PvP);
+    ScoreManager::instance().reset();
+    m_ball->reset();
+    m_currentState = GameState::PLAYING;
 }
+
+void Game::onStartPvAI() {
+    GameModeManager::instance().selectMode(ModeType::PvAI);
+    ScoreManager::instance().reset();
+    m_ball->reset();
+    m_currentState = GameState::PLAYING;
+}
+
+void Game::onPause() { m_currentState = GameState::PAUSED; }
+
+void Game::onResume() { m_currentState = GameState::PLAYING; }
+
+void Game::onRestart() {
+    ScoreManager::instance().reset();
+    m_ball->reset();
+    m_currentState = GameState::PLAYING;
+}
+
+void Game::onBackToMenu() {
+    ScoreManager::instance().reset();
+    m_ball->reset();
+    m_currentState = GameState::MENU;
+}
+
+void Game::onCloseGame() { m_window.close(); }
