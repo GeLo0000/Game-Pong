@@ -1,40 +1,37 @@
 #include "AudioManager.hpp"
-
 #include <iostream>
 
-AudioManager &AudioManager::instance() {
-    static AudioManager inst;
-    return inst;
-}
+AudioManager::AudioManager(ResourceManager &resourceMgr, EventManager &eventMgr)
+    : m_resourceMgr(resourceMgr), m_eventMgr(eventMgr) {
+    resourceMgr.loadSoundBuffer("paddle_hit", "assets/audio/paddle_hit.ogg");
+    resourceMgr.loadSoundBuffer("wall_hit", "assets/audio/wall_hit.ogg");
+    resourceMgr.loadSoundBuffer("goal", "assets/audio/goal.ogg");
 
-AudioManager::AudioManager() {
-    auto &rm = ResourceManager::instance();
-    rm.loadSoundBuffer("paddle_hit", "assets/audio/paddle_hit.ogg");
-    rm.loadSoundBuffer("wall_hit", "assets/audio/wall_hit.ogg");
-    rm.loadSoundBuffer("goal", "assets/audio/goal.ogg");
-
-    auto &em = EventManager::instance();
     m_subscriptions.push_back(
-        {EventType::PADDLE_HIT,
-         em.subscribe(EventType::PADDLE_HIT, [this](const Event &e) { onEvent(e); })});
+        {EventType::PADDLE_HIT, m_eventMgr.subscribe(EventType::PADDLE_HIT, [this](const Event &e) {
+             playSoundEffect("paddle_hit");
+         })});
     m_subscriptions.push_back(
-        {EventType::WALL_HIT,
-         em.subscribe(EventType::WALL_HIT, [this](const Event &e) { onEvent(e); })});
-    m_subscriptions.push_back(
-        {EventType::GOAL_SCORED,
-         em.subscribe(EventType::GOAL_SCORED, [this](const Event &e) { onEvent(e); })});
-    m_subscriptions.push_back(
-        {EventType::GAME_PAUSED,
-         em.subscribe(EventType::GAME_PAUSED, [this](const Event &e) { onEvent(e); })});
+        {EventType::WALL_HIT, m_eventMgr.subscribe(EventType::WALL_HIT, [this](const Event &e) {
+             playSoundEffect("wall_hit");
+         })});
+    m_subscriptions.push_back({EventType::GOAL_SCORED,
+                               m_eventMgr.subscribe(EventType::GOAL_SCORED, [this](const Event &e) {
+                                   playSoundEffect("goal");
+                               })});
+    m_subscriptions.push_back({EventType::GAME_PAUSED,
+                               m_eventMgr.subscribe(EventType::GAME_PAUSED, [this](const Event &e) {
+                                   pauseBackgroundMusic();
+                               })});
     m_subscriptions.push_back(
         {EventType::GAME_RESUMED,
-         em.subscribe(EventType::GAME_RESUMED, [this](const Event &e) { onEvent(e); })});
+         m_eventMgr.subscribe(EventType::GAME_RESUMED,
+                              [this](const Event &e) { resumeBackgroundMusic(); })});
 }
 
 AudioManager::~AudioManager() {
-    auto &em = EventManager::instance();
     for (const auto &[type, id] : m_subscriptions) {
-        em.unsubscribe(type, id);
+        m_eventMgr.unsubscribe(type, id);
     }
 }
 
@@ -68,7 +65,7 @@ void AudioManager::resumeBackgroundMusic() {
 }
 
 void AudioManager::playSoundEffect(const std::string &name, float volume) {
-    const auto *buffer = ResourceManager::instance().getSoundBuffer(name);
+    const auto *buffer = m_resourceMgr.getSoundBuffer(name);
     if (!buffer) {
         return;
     }
@@ -81,25 +78,5 @@ void AudioManager::playSoundEffect(const std::string &name, float volume) {
         it->second.setBuffer(*buffer);
         it->second.setVolume(volume);
         it->second.play();
-    }
-}
-
-void AudioManager::onEvent(const Event &event) {
-    switch (event.type) {
-    case EventType::PADDLE_HIT:
-        playSoundEffect("paddle_hit");
-        break;
-    case EventType::WALL_HIT:
-        playSoundEffect("wall_hit");
-        break;
-    case EventType::GOAL_SCORED:
-        playSoundEffect("goal");
-        break;
-    case EventType::GAME_PAUSED:
-        pauseBackgroundMusic();
-        break;
-    case EventType::GAME_RESUMED:
-        resumeBackgroundMusic();
-        break;
     }
 }

@@ -1,18 +1,19 @@
 #pragma once
 
+#include "Ball.hpp"
+#include "ScoreManager.hpp"
 #include "UIButton.hpp"
 #include "UICanvas.hpp"
 #include "UILabel.hpp"
 #include <SFML/Graphics.hpp>
 #include <memory>
 
-// Manages all UI rendering and state
 class UIManager {
   public:
     UIManager(float windowWidth, float windowHeight);
 
     void renderMenu(sf::RenderWindow &window);
-    void renderGameUI(sf::RenderWindow &window, sf::Vector2f ballVelocity);
+    void renderGameUI(sf::RenderWindow &window, const Ball &ball, ScoreManager &scoreManager);
     void renderPause(sf::RenderWindow &window);
 
   private:
@@ -53,7 +54,6 @@ class UIManager {
     static constexpr int kPauseButtonTextSize = 15;
     static constexpr float kPausePadding = 12.0f;
 
-    // Color constants
     static constexpr int kPauseCanvasBgGrey = 80;
     static constexpr int kPauseButtonBgGrey = 50;
     static constexpr int kGreyColor = 150;

@@ -1,5 +1,4 @@
 #include "Game.hpp"
-#include "AudioManager.hpp"
 #include "EventManager.hpp"
 #include "GameMode.hpp"
 #include "GameObjectFactory.hpp"
@@ -22,21 +21,20 @@ Game::Game()
 Game::~Game() = default;
 
 void Game::createGameObjects() {
-    auto &factory = GameObjectFactory::instance();
+    m_leftPaddle = GameObjectFactory::createPaddle(kPaddleLeftX, kWindowHeight / 2.0f, kPaddleWidth,
+                                                   kPaddleHeight, kWindowHeight);
 
-    m_leftPaddle = factory.createPaddle(kPaddleLeftX, kWindowHeight / 2.0f, kPaddleWidth,
-                                        kPaddleHeight, kWindowHeight);
+    m_rightPaddle = GameObjectFactory::createPaddle(
+        kWindowWidth - kPaddleRightXOffset - kPaddleWidth, kWindowHeight / 2.0f, kPaddleWidth,
+        kPaddleHeight, kWindowHeight, true);
 
-    m_rightPaddle = factory.createPaddle(kWindowWidth - kPaddleRightXOffset - kPaddleWidth,
-                                         kWindowHeight / 2.0f, kPaddleWidth, kPaddleHeight,
-                                         kWindowHeight, true);
-
-    m_ball = factory.createBall(kWindowWidth / 2.0f, kWindowHeight / 2.0f, kBallRadius,
-                                kWindowWidth, kWindowHeight);
+    m_ball = GameObjectFactory::createBall(kWindowWidth / 2.0f, kWindowHeight / 2.0f, kBallRadius,
+                                           kWindowWidth, kWindowHeight);
 }
 
 void Game::initializeComponents() {
-    AudioManager::instance();
+    m_audioManager =
+        std::make_unique<AudioManager>(ResourceManager::instance(), EventManager::instance());
     m_uiManager = std::make_unique<UIManager>(kWindowWidth, kWindowHeight);
     m_inputHandler = std::make_unique<InputHandler>();
     m_collisionHandler = std::make_unique<CollisionHandler>();
@@ -93,7 +91,7 @@ void Game::render() {
         m_ball->draw(m_window);
     }
 
-    m_uiManager->renderGameUI(m_window, m_ball->getVelocity());
+    m_uiManager->renderGameUI(m_window, *m_ball, ScoreManager::instance());
 
     if (m_currentState == GameState::PAUSED) {
         m_uiManager->renderPause(m_window);
@@ -126,7 +124,7 @@ void Game::onInputEvent(const Event &event) {
         ScoreManager::instance().reset();
         m_ball->reset();
         m_currentState = GameState::PLAYING;
-        AudioManager::instance().playBackgroundMusic("assets/audio/background.ogg");
+        m_audioManager->playBackgroundMusic("assets/audio/background.ogg");
         break;
 
     case EventType::INPUT_START_PVAI:
@@ -134,7 +132,7 @@ void Game::onInputEvent(const Event &event) {
         ScoreManager::instance().reset();
         m_ball->reset();
         m_currentState = GameState::PLAYING;
-        AudioManager::instance().playBackgroundMusic("assets/audio/background.ogg");
+        m_audioManager->playBackgroundMusic("assets/audio/background.ogg");
         break;
 
     case EventType::INPUT_PAUSE:

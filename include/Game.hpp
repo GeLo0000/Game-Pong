@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AudioManager.hpp"
 #include "Ball.hpp"
 #include "CollisionHandler.hpp"
 #include "InputHandler.hpp"
@@ -47,6 +48,7 @@ class Game {
     std::unique_ptr<Paddle> m_rightPaddle;
     std::unique_ptr<Ball> m_ball;
 
+    std::unique_ptr<AudioManager> m_audioManager;
     std::unique_ptr<UIManager> m_uiManager;
     std::unique_ptr<InputHandler> m_inputHandler;
     std::unique_ptr<CollisionHandler> m_collisionHandler;

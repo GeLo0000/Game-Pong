@@ -132,16 +132,19 @@ void UIManager::renderMenu(sf::RenderWindow &window) {
     }
 }
 
-void UIManager::renderGameUI(sf::RenderWindow &window, sf::Vector2f ballVelocity) {
-    const int leftScore = ScoreManager::instance().getLeftScore();
-    const int rightScore = ScoreManager::instance().getRightScore();
+void UIManager::renderGameUI(sf::RenderWindow &window, const Ball &ball,
+                             ScoreManager &scoreManager) {
+    const int leftScore = scoreManager.getLeftScore();
+    const int rightScore = scoreManager.getRightScore();
     if (m_scoreLabel) {
         m_scoreLabel->setText(std::to_string(leftScore) + " : " + std::to_string(rightScore));
     }
 
     if (m_speedLabel) {
-        float speed = std::sqrt(ballVelocity.x * ballVelocity.x + ballVelocity.y * ballVelocity.y);
-        m_speedLabel->setText("Ball Speed: " + std::to_string(static_cast<int>(speed)));
+        sf::Vector2f ballVelocity = ball.getVelocity();
+        auto speed = static_cast<int>(
+            std::sqrt(ballVelocity.x * ballVelocity.x + ballVelocity.y * ballVelocity.y));
+        m_speedLabel->setText("Ball Speed: " + std::to_string(speed));
     }
 
     if (m_gameCanvas) {

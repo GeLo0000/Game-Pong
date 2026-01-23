@@ -9,8 +9,8 @@
 
 class AudioManager {
   public:
-    static AudioManager &instance();
-
+    AudioManager(ResourceManager &resourceMgr, EventManager &eventMgr);
+    ~AudioManager();
     bool playBackgroundMusic(const std::string &path, float volume = 20.0f);
     void pauseBackgroundMusic();
     void resumeBackgroundMusic();
@@ -18,13 +18,8 @@ class AudioManager {
     void playSoundEffect(const std::string &name, float volume = 65.0f);
 
   private:
-    AudioManager();
-    ~AudioManager();
-
-    AudioManager(const AudioManager &) = delete;
-    AudioManager &operator=(const AudioManager &) = delete;
-
-    void onEvent(const Event &event);
+    ResourceManager &m_resourceMgr;
+    EventManager &m_eventMgr;
 
     sf::Music m_music;
     std::unordered_map<std::string, sf::Sound> m_sounds;
