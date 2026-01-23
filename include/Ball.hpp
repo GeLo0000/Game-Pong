@@ -18,10 +18,16 @@ class Ball : public IGameObject {
     void increaseSpeed();
 
   private:
+    static constexpr float kInitialVelocityX = 200.0f;
+    static constexpr float kInitialVelocityY = 150.0f;
+    static constexpr float kSpeedMultiplier = 1.05f;
+    static constexpr float kMaxSpeed = 2000.0f;
+    static constexpr float kBaseSpeed = 300.0f;
+    static constexpr float kAngleRange = 45.0f;
+    static constexpr float kPi = 3.14159f;
+
     sf::CircleShape m_shape;
     sf::Vector2f m_velocity;
     float m_windowWidth;
     float m_windowHeight;
-    float m_speedMultiplier;
-    float m_maxSpeed;
 };

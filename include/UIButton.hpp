@@ -31,6 +31,11 @@ class UIButton : public IUIElement {
   private:
     void centerText();
 
+    static constexpr float kOutlineThickness = 3.0f;
+    static constexpr unsigned int kDefaultTextSize = 24;
+    static constexpr int kHoverBgGrey = 50;
+    static constexpr int kHoverBgAlpha = 100;
+
     sf::RectangleShape m_background;
     sf::Text m_text;
     bool m_isHovered;

@@ -20,5 +20,7 @@ class UILabel : public IUIElement {
     sf::FloatRect getBounds() const;
 
   private:
+    static constexpr unsigned int kDefaultTextSize = 24;
+
     sf::Text m_text;
 };

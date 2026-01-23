@@ -8,12 +8,11 @@
 #include <string>
 
 Game::Game()
-    : m_windowWidth(800.0f), m_windowHeight(600.0f),
-      m_window(sf::VideoMode({static_cast<unsigned int>(m_windowWidth),
-                              static_cast<unsigned int>(m_windowHeight)}),
+    : m_window(sf::VideoMode({static_cast<unsigned int>(kWindowWidth),
+                              static_cast<unsigned int>(kWindowHeight)}),
                "Pong Game"),
       m_currentState(GameState::MENU) {
-    m_window.setFramerateLimit(144);
+    m_window.setFramerateLimit(kFramerateLimit);
 
     createGameObjects();
     initializeComponents();
@@ -24,23 +23,21 @@ Game::~Game() = default;
 
 void Game::createGameObjects() {
     auto &factory = GameObjectFactory::instance();
-    const float paddleWidth = 15.0f;
-    const float paddleHeight = 100.0f;
 
-    m_leftPaddle = factory.createPaddle(50.0f, m_windowHeight / 2.0f, paddleWidth, paddleHeight,
-                                        m_windowHeight);
+    m_leftPaddle = factory.createPaddle(kPaddleLeftX, kWindowHeight / 2.0f, kPaddleWidth,
+                                        kPaddleHeight, kWindowHeight);
 
-    m_rightPaddle = factory.createPaddle(m_windowWidth - 50.0f - paddleWidth, m_windowHeight / 2.0f,
-                                         paddleWidth, paddleHeight, m_windowHeight, true);
+    m_rightPaddle = factory.createPaddle(kWindowWidth - kPaddleRightXOffset - kPaddleWidth,
+                                         kWindowHeight / 2.0f, kPaddleWidth, kPaddleHeight,
+                                         kWindowHeight, true);
 
-    const float ballRadius = 10.0f;
-    m_ball = factory.createBall(m_windowWidth / 2.0f, m_windowHeight / 2.0f, ballRadius,
-                                m_windowWidth, m_windowHeight);
+    m_ball = factory.createBall(kWindowWidth / 2.0f, kWindowHeight / 2.0f, kBallRadius,
+                                kWindowWidth, kWindowHeight);
 }
 
 void Game::initializeComponents() {
     AudioManager::instance();
-    m_uiManager = std::make_unique<UIManager>(m_windowWidth, m_windowHeight);
+    m_uiManager = std::make_unique<UIManager>(kWindowWidth, kWindowHeight);
     m_inputHandler = std::make_unique<InputHandler>();
     m_collisionHandler = std::make_unique<CollisionHandler>();
 }
@@ -107,7 +104,7 @@ void Game::render() {
 
 void Game::handleCollisions() {
     m_collisionHandler->handleCollisions(*m_ball, *m_leftPaddle, *m_rightPaddle,
-                                         {m_windowWidth, m_windowHeight});
+                                         {kWindowWidth, kWindowHeight});
 }
 
 void Game::subscribeToEvents() {

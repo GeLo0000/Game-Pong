@@ -18,8 +18,10 @@ class Paddle : public IGameObject {
     void setPosition(sf::Vector2f position);
 
   private:
+    static constexpr float kMoveSpeed = 400.0f;
+    static constexpr float kAiDetectionThreshold = 10.0f;
+
     sf::RectangleShape m_shape;
-    float m_moveSpeed;
     float m_velocityY;
     float m_windowHeight;
     bool m_isAI;

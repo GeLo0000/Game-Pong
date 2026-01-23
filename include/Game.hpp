@@ -29,8 +29,16 @@ class Game {
     void onInputEvent(const Event &event);
 
   private:
-    float m_windowWidth;
-    float m_windowHeight;
+    static constexpr float kWindowWidth = 800.0f;
+    static constexpr float kWindowHeight = 600.0f;
+    static constexpr int kFramerateLimit = 144;
+
+    static constexpr float kPaddleWidth = 15.0f;
+    static constexpr float kPaddleHeight = 100.0f;
+    static constexpr float kPaddleLeftX = 50.0f;
+    static constexpr float kPaddleRightXOffset = 50.0f;
+
+    static constexpr float kBallRadius = 10.0f;
 
     sf::RenderWindow m_window;
     sf::Clock m_clock;

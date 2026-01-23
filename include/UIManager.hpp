@@ -20,6 +20,44 @@ class UIManager {
     void createMenuCanvas();
     void createPauseCanvas();
 
+    static constexpr float kScoreLabelOffsetX = 50.0f;
+    static constexpr float kScoreLabelY = 20.0f;
+    static constexpr int kScoreLabelTextSize = 30;
+
+    static constexpr float kSpeedLabelOffsetX = 60.0f;
+    static constexpr float kSpeedLabelOffsetY = 40.0f;
+    static constexpr int kSpeedLabelTextSize = 20;
+
+    static constexpr int kTitleLabelTextSize = 80;
+    static constexpr float kTitleLabelOffsetX = 100.0f;
+    static constexpr float kTitleLabelY = 80.0f;
+    static constexpr float kHintLabelX = 20.0f;
+    static constexpr float kHintLabelY = 20.0f;
+    static constexpr int kHintLabelTextSize = 18;
+
+    static constexpr float kButtonWidth = 200.0f;
+    static constexpr float kButtonHeight = 120.0f;
+    static constexpr float kButtonSpacing = 100.0f;
+    static constexpr float kButtonMenuYOffset = 20.0f;
+    static constexpr int kButtonTextSize = 24;
+    static constexpr float kButtonOutlineThickness = 3.0f;
+
+    static constexpr float kPauseOverlayWidth = 600.0f;
+    static constexpr float kPauseOverlayHeight = 200.0f;
+    static constexpr float kPauseTitleOffsetX = 60.0f;
+    static constexpr float kPauseTitleYOffset = 20.0f;
+    static constexpr int kPauseTitleTextSize = 36;
+    static constexpr float kPauseButtonWidth = 135.0f;
+    static constexpr float kPauseButtonHeight = 50.0f;
+    static constexpr float kPauseButtonSpacing = 12.0f;
+    static constexpr int kPauseButtonTextSize = 15;
+    static constexpr float kPausePadding = 12.0f;
+
+    // Color constants
+    static constexpr int kPauseCanvasBgGrey = 80;
+    static constexpr int kPauseButtonBgGrey = 50;
+    static constexpr int kGreyColor = 150;
+
     float m_windowWidth;
     float m_windowHeight;
 

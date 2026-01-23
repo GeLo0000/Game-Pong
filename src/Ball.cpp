@@ -4,8 +4,8 @@
 #include <random>
 
 Ball::Ball(float x, float y, float radius, float windowWidth, float windowHeight)
-    : m_velocity(200.0f, 150.0f), m_windowWidth(windowWidth), m_windowHeight(windowHeight),
-      m_speedMultiplier(1.05f), m_maxSpeed(2000.0f) {
+    : m_velocity(kInitialVelocityX, kInitialVelocityY), m_windowWidth(windowWidth),
+      m_windowHeight(windowHeight) {
     m_shape.setRadius(radius);
     m_shape.setPosition({x - radius, y - radius});
     m_shape.setFillColor(sf::Color::Yellow);
@@ -28,15 +28,14 @@ void Ball::reset() {
 
     static std::random_device rd;
     static std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> angleDist(-45.0f, 45.0f);
+    std::uniform_real_distribution<float> angleDist(-kAngleRange, kAngleRange);
     std::uniform_int_distribution<int> dirDist(0, 1);
 
     float angle = angleDist(gen);
-    float radians = angle * 3.14159f / 180.0f;
-    float baseSpeed = 300.0f;
+    float radians = angle * kPi / 180.0f;
     float dirX = dirDist(gen) == 0 ? 1.0f : -1.0f;
 
-    m_velocity = {dirX * baseSpeed * std::cos(radians), baseSpeed * std::sin(radians)};
+    m_velocity = {dirX * kBaseSpeed * std::cos(radians), kBaseSpeed * std::sin(radians)};
 }
 
 void Ball::setVelocity(float vx, float vy) { m_velocity = {vx, vy}; }
@@ -47,15 +46,15 @@ void Ball::setPosition(sf::Vector2f position) { m_shape.setPosition(position); }
 
 void Ball::increaseSpeed() {
     float currentSpeed = std::sqrt(m_velocity.x * m_velocity.x + m_velocity.y * m_velocity.y);
-    if (currentSpeed >= m_maxSpeed) {
+    if (currentSpeed >= kMaxSpeed) {
         return;
     }
-    m_velocity.x *= m_speedMultiplier;
-    m_velocity.y *= m_speedMultiplier;
+    m_velocity.x *= kSpeedMultiplier;
+    m_velocity.y *= kSpeedMultiplier;
 
     float newSpeed = std::sqrt(m_velocity.x * m_velocity.x + m_velocity.y * m_velocity.y);
-    if (newSpeed > m_maxSpeed) {
-        float scale = m_maxSpeed / newSpeed;
+    if (newSpeed > kMaxSpeed) {
+        float scale = kMaxSpeed / newSpeed;
         m_velocity.x *= scale;
         m_velocity.y *= scale;
     }

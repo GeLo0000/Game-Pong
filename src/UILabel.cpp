@@ -3,7 +3,7 @@
 UILabel::UILabel(const sf::Vector2f &position, const std::string &text, const sf::Font &font)
     : m_text(font) {
     m_text.setString(text);
-    m_text.setCharacterSize(24);
+    m_text.setCharacterSize(kDefaultTextSize);
     m_text.setFillColor(sf::Color::White);
     m_text.setPosition(position);
 }

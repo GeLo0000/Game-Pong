@@ -3,16 +3,17 @@
 UIButton::UIButton(const sf::Vector2f &position, const sf::Vector2f &size, const std::string &text,
                    const sf::Font &font)
     : m_text(font), m_isHovered(false), m_normalColor(sf::Color::Transparent),
-      m_hoverColor(sf::Color(50, 50, 50, 100)), m_outlineColor(sf::Color::White) {
+      m_hoverColor(sf::Color(kHoverBgGrey, kHoverBgGrey, kHoverBgGrey, kHoverBgAlpha)),
+      m_outlineColor(sf::Color::White) {
 
     m_background.setPosition(position);
     m_background.setSize(size);
     m_background.setFillColor(m_normalColor);
     m_background.setOutlineColor(m_outlineColor);
-    m_background.setOutlineThickness(3.0f);
+    m_background.setOutlineThickness(kOutlineThickness);
 
     m_text.setString(text);
-    m_text.setCharacterSize(24);
+    m_text.setCharacterSize(kDefaultTextSize);
     m_text.setFillColor(sf::Color::White);
 
     centerText();
