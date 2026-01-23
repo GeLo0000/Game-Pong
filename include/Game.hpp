@@ -47,6 +47,8 @@ class Game {
 
     static constexpr float kBallRadius = 10.0f;
 
+    static constexpr auto kWindowTitle = "Pong Game";
+
     sf::RenderWindow m_window;
     sf::Clock m_clock;
 

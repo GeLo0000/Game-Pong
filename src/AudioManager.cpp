@@ -3,26 +3,27 @@
 
 AudioManager::AudioManager(ResourceManager &resourceMgr, EventManager &eventMgr)
     : m_resourceMgr(resourceMgr), m_eventMgr(eventMgr) {
-    resourceMgr.loadSoundBuffer("paddle_hit", "assets/audio/paddle_hit.ogg");
-    resourceMgr.loadSoundBuffer("wall_hit", "assets/audio/wall_hit.ogg");
-    resourceMgr.loadSoundBuffer("goal", "assets/audio/goal.ogg");
+    resourceMgr.loadSoundBuffer(kSoundPaddleHitName, kAudioPaddleHitPath);
+    resourceMgr.loadSoundBuffer(kSoundWallHitName, kAudioWallHitPath);
+    resourceMgr.loadSoundBuffer(kSoundGoalName, kAudioGoalPath);
 
     m_subscriptions.push_back(
         {EventType::PADDLE_HIT,
-         m_eventMgr.subscribe(EventType::PADDLE_HIT,
-                              [this](const EventType &e) { playSoundEffect("paddle_hit"); })});
+         m_eventMgr.subscribe(EventType::PADDLE_HIT, [this](const EventType &e) {
+             playSoundEffect(kSoundPaddleHitName);
+         })});
     m_subscriptions.push_back(
         {EventType::WALL_HIT, m_eventMgr.subscribe(EventType::WALL_HIT, [this](const EventType &e) {
-             playSoundEffect("wall_hit");
+             playSoundEffect(kSoundWallHitName);
          })});
     m_subscriptions.push_back(
         {EventType::GOAL_SCORED_LEFT,
          m_eventMgr.subscribe(EventType::GOAL_SCORED_LEFT,
-                              [this](const EventType &e) { playSoundEffect("goal"); })});
+                              [this](const EventType &e) { playSoundEffect(kSoundGoalName); })});
     m_subscriptions.push_back(
         {EventType::GOAL_SCORED_RIGHT,
          m_eventMgr.subscribe(EventType::GOAL_SCORED_RIGHT,
-                              [this](const EventType &e) { playSoundEffect("goal"); })});
+                              [this](const EventType &e) { playSoundEffect(kSoundGoalName); })});
 
     m_subscriptions.push_back(
         {EventType::INPUT_PAUSE,
@@ -43,12 +44,12 @@ AudioManager::AudioManager(ResourceManager &resourceMgr, EventManager &eventMgr)
     m_subscriptions.push_back(
         {EventType::INPUT_START_PVP,
          m_eventMgr.subscribe(EventType::INPUT_START_PVP, [this](const EventType &e) {
-             playBackgroundMusic("assets/audio/background.ogg");
+             playBackgroundMusic(kAudioBackgroundPath);
          })});
     m_subscriptions.push_back(
         {EventType::INPUT_START_PVAI,
          m_eventMgr.subscribe(EventType::INPUT_START_PVAI, [this](const EventType &e) {
-             playBackgroundMusic("assets/audio/background.ogg");
+             playBackgroundMusic(kAudioBackgroundPath);
          })});
 }
 

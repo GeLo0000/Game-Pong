@@ -9,7 +9,7 @@
 Game::Game()
     : m_window(sf::VideoMode({static_cast<unsigned int>(kWindowWidth),
                               static_cast<unsigned int>(kWindowHeight)}),
-               "Pong Game"),
+               kWindowTitle),
       m_currentState(GameState::MENU) {
     m_window.setFramerateLimit(kFramerateLimit);
 

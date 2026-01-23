@@ -17,6 +17,15 @@ class AudioManager {
 
     void playSoundEffect(const std::string &name, float volume = 65.0f);
 
+    static constexpr auto kSoundPaddleHitName = "paddleHitSound";
+    static constexpr auto kSoundWallHitName = "wallHitSound";
+    static constexpr auto kSoundGoalName = "goalSound";
+
+    static constexpr auto kAudioPaddleHitPath = "assets/audio/paddle_hit.ogg";
+    static constexpr auto kAudioWallHitPath = "assets/audio/wall_hit.ogg";
+    static constexpr auto kAudioGoalPath = "assets/audio/goal.ogg";
+    static constexpr auto kAudioBackgroundPath = "assets/audio/background.ogg";
+
   private:
     ResourceManager &m_resourceMgr;
     EventManager &m_eventMgr;
