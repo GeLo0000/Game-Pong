@@ -35,9 +35,10 @@ void Game::createGameObjects() {
 void Game::initializeComponents() {
     m_audioManager =
         std::make_unique<AudioManager>(ResourceManager::instance(), EventManager::instance());
-    m_uiManager = std::make_unique<UIManager>(kWindowWidth, kWindowHeight);
+    m_uiManager =
+        std::make_unique<UIManager>(kWindowWidth, kWindowHeight, ResourceManager::instance());
     m_inputHandler = std::make_unique<InputHandler>();
-    m_collisionHandler = std::make_unique<CollisionHandler>();
+    m_collisionHandler = std::make_unique<CollisionHandler>(EventManager::instance());
 }
 
 void Game::run() {
@@ -54,7 +55,7 @@ void Game::processEvents() {
         if (ev->is<sf::Event::Closed>()) {
             m_window.close();
         } else if (const auto *kp = ev->getIf<sf::Event::KeyPressed>()) {
-            m_inputHandler->handleKeyPress(*kp, m_currentState);
+            m_inputHandler->handleKeyPress(*kp, m_currentState, EventManager::instance());
         }
     }
 }

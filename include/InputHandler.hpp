@@ -10,5 +10,6 @@ class InputHandler {
     InputHandler() = default;
     ~InputHandler() = default;
 
-    void handleKeyPress(const sf::Event::KeyPressed &key, GameState currentState);
+    void handleKeyPress(const sf::Event::KeyPressed &key, GameState currentState,
+                        EventManager &eventMgr);
 };

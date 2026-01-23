@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ball.hpp"
+#include "ResourceManager.hpp"
 #include "ScoreManager.hpp"
 #include "UIButton.hpp"
 #include "UICanvas.hpp"
@@ -10,7 +11,7 @@
 
 class UIManager {
   public:
-    UIManager(float windowWidth, float windowHeight);
+    UIManager(float windowWidth, float windowHeight, ResourceManager &resourceMgr);
 
     void renderMenu(sf::RenderWindow &window);
     void renderGameUI(sf::RenderWindow &window, const Ball &ball, ScoreManager &scoreManager);
@@ -77,6 +78,8 @@ class UIManager {
 
     float m_windowWidth;
     float m_windowHeight;
+
+    ResourceManager &m_resourceMgr;
 
     const sf::Font *m_font;
 

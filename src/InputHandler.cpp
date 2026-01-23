@@ -2,9 +2,8 @@
 
 #include "Game.hpp"
 
-void InputHandler::handleKeyPress(const sf::Event::KeyPressed &key, GameState currentState) {
-    auto &eventMgr = EventManager::instance();
-
+void InputHandler::handleKeyPress(const sf::Event::KeyPressed &key, GameState currentState,
+                                  EventManager &eventMgr) {
     if (key.scancode == sf::Keyboard::Scancode::Escape) {
         eventMgr.emit({EventType::INPUT_CLOSE_GAME});
         return;
