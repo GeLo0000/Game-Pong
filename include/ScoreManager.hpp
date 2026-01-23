@@ -18,9 +18,8 @@ class ScoreManager {
     ScoreManager(const ScoreManager &) = delete;
     ScoreManager &operator=(const ScoreManager &) = delete;
 
-    void onGoalScored(const Event &event);
-
     int m_leftScore;
     int m_rightScore;
-    std::size_t m_subscriptionId;
+    std::size_t m_subscriptionIdLeft;
+    std::size_t m_subscriptionIdRight;
 };

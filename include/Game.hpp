@@ -27,7 +27,7 @@ class Game {
     void initializeComponents();
     void subscribeToEvents();
 
-    void onInputEvent(const Event &event);
+    void onInputEvent(const EventType &event);
 
   private:
     static constexpr float kWindowWidth = 800.0f;

@@ -8,25 +8,48 @@ AudioManager::AudioManager(ResourceManager &resourceMgr, EventManager &eventMgr)
     resourceMgr.loadSoundBuffer("goal", "assets/audio/goal.ogg");
 
     m_subscriptions.push_back(
-        {EventType::PADDLE_HIT, m_eventMgr.subscribe(EventType::PADDLE_HIT, [this](const Event &e) {
-             playSoundEffect("paddle_hit");
-         })});
+        {EventType::PADDLE_HIT,
+         m_eventMgr.subscribe(EventType::PADDLE_HIT,
+                              [this](const EventType &e) { playSoundEffect("paddle_hit"); })});
     m_subscriptions.push_back(
-        {EventType::WALL_HIT, m_eventMgr.subscribe(EventType::WALL_HIT, [this](const Event &e) {
+        {EventType::WALL_HIT, m_eventMgr.subscribe(EventType::WALL_HIT, [this](const EventType &e) {
              playSoundEffect("wall_hit");
          })});
-    m_subscriptions.push_back({EventType::GOAL_SCORED,
-                               m_eventMgr.subscribe(EventType::GOAL_SCORED, [this](const Event &e) {
-                                   playSoundEffect("goal");
-                               })});
-    m_subscriptions.push_back({EventType::GAME_PAUSED,
-                               m_eventMgr.subscribe(EventType::GAME_PAUSED, [this](const Event &e) {
-                                   pauseBackgroundMusic();
-                               })});
     m_subscriptions.push_back(
-        {EventType::GAME_RESUMED,
-         m_eventMgr.subscribe(EventType::GAME_RESUMED,
-                              [this](const Event &e) { resumeBackgroundMusic(); })});
+        {EventType::GOAL_SCORED_LEFT,
+         m_eventMgr.subscribe(EventType::GOAL_SCORED_LEFT,
+                              [this](const EventType &e) { playSoundEffect("goal"); })});
+    m_subscriptions.push_back(
+        {EventType::GOAL_SCORED_RIGHT,
+         m_eventMgr.subscribe(EventType::GOAL_SCORED_RIGHT,
+                              [this](const EventType &e) { playSoundEffect("goal"); })});
+
+    m_subscriptions.push_back(
+        {EventType::INPUT_PAUSE,
+         m_eventMgr.subscribe(EventType::INPUT_PAUSE,
+                              [this](const EventType &e) { pauseBackgroundMusic(); })});
+    m_subscriptions.push_back(
+        {EventType::INPUT_BACK_TO_MENU,
+         m_eventMgr.subscribe(EventType::INPUT_BACK_TO_MENU,
+                              [this](const EventType &e) { pauseBackgroundMusic(); })});
+    m_subscriptions.push_back(
+        {EventType::INPUT_RESUME,
+         m_eventMgr.subscribe(EventType::INPUT_RESUME,
+                              [this](const EventType &e) { resumeBackgroundMusic(); })});
+    m_subscriptions.push_back(
+        {EventType::INPUT_RESTART,
+         m_eventMgr.subscribe(EventType::INPUT_RESTART,
+                              [this](const EventType &e) { resumeBackgroundMusic(); })});
+    m_subscriptions.push_back(
+        {EventType::INPUT_START_PVP,
+         m_eventMgr.subscribe(EventType::INPUT_START_PVP, [this](const EventType &e) {
+             playBackgroundMusic("assets/audio/background.ogg");
+         })});
+    m_subscriptions.push_back(
+        {EventType::INPUT_START_PVAI,
+         m_eventMgr.subscribe(EventType::INPUT_START_PVAI, [this](const EventType &e) {
+             playBackgroundMusic("assets/audio/background.ogg");
+         })});
 }
 
 AudioManager::~AudioManager() {

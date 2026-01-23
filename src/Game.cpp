@@ -108,23 +108,25 @@ void Game::handleCollisions() {
 void Game::subscribeToEvents() {
     auto &eventMgr = EventManager::instance();
 
-    eventMgr.subscribe(EventType::INPUT_START_PVP, [this](const Event &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_START_PVAI, [this](const Event &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_PAUSE, [this](const Event &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_RESUME, [this](const Event &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_RESTART, [this](const Event &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_BACK_TO_MENU, [this](const Event &e) { onInputEvent(e); });
-    eventMgr.subscribe(EventType::INPUT_CLOSE_GAME, [this](const Event &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_START_PVP, [this](const EventType &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_START_PVAI,
+                       [this](const EventType &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_PAUSE, [this](const EventType &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_RESUME, [this](const EventType &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_RESTART, [this](const EventType &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_BACK_TO_MENU,
+                       [this](const EventType &e) { onInputEvent(e); });
+    eventMgr.subscribe(EventType::INPUT_CLOSE_GAME,
+                       [this](const EventType &e) { onInputEvent(e); });
 }
 
-void Game::onInputEvent(const Event &event) {
-    switch (event.type) {
+void Game::onInputEvent(const EventType &event) {
+    switch (event) {
     case EventType::INPUT_START_PVP:
         GameModeManager::instance().selectMode(ModeType::PvP);
         ScoreManager::instance().reset();
         m_ball->reset();
         m_currentState = GameState::PLAYING;
-        m_audioManager->playBackgroundMusic("assets/audio/background.ogg");
         break;
 
     case EventType::INPUT_START_PVAI:
@@ -132,31 +134,26 @@ void Game::onInputEvent(const Event &event) {
         ScoreManager::instance().reset();
         m_ball->reset();
         m_currentState = GameState::PLAYING;
-        m_audioManager->playBackgroundMusic("assets/audio/background.ogg");
         break;
 
     case EventType::INPUT_PAUSE:
         m_currentState = GameState::PAUSED;
-        EventManager::instance().emit({EventType::GAME_PAUSED, "paused"});
         break;
 
     case EventType::INPUT_RESUME:
         m_currentState = GameState::PLAYING;
-        EventManager::instance().emit({EventType::GAME_RESUMED, "resumed"});
         break;
 
     case EventType::INPUT_RESTART:
         ScoreManager::instance().reset();
         m_ball->reset();
         m_currentState = GameState::PLAYING;
-        EventManager::instance().emit({EventType::GAME_RESUMED, "restarted"});
         break;
 
     case EventType::INPUT_BACK_TO_MENU:
         ScoreManager::instance().reset();
         m_ball->reset();
         m_currentState = GameState::MENU;
-        EventManager::instance().emit({EventType::GAME_PAUSED, "menu"});
         break;
 
     case EventType::INPUT_CLOSE_GAME:

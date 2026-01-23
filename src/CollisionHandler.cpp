@@ -20,12 +20,12 @@ void CollisionHandler::handleWallCollision(Ball &ball, const sf::Vector2f &windo
         ballBounds.position.y = 0.0f;
         ball.setPosition(ballBounds.position);
         ball.setVelocity(velocity.x, -velocity.y);
-        EventManager::instance().emit({EventType::WALL_HIT, "top"});
+        EventManager::instance().emit({EventType::WALL_HIT});
     } else if (ballBounds.position.y + ballBounds.size.y > windowSize.y) {
         ballBounds.position.y = windowSize.y - ballBounds.size.y;
         ball.setPosition(ballBounds.position);
         ball.setVelocity(velocity.x, -velocity.y);
-        EventManager::instance().emit({EventType::WALL_HIT, "bottom"});
+        EventManager::instance().emit({EventType::WALL_HIT});
     }
 }
 
@@ -33,13 +33,13 @@ void CollisionHandler::handleGoal(Ball &ball, const sf::Vector2f &windowSize) {
     auto ballBounds = ball.getBounds();
 
     if (ballBounds.position.x + ballBounds.size.x < 0.0f) {
-        EventManager::instance().emit({EventType::GOAL_SCORED, "left wall"});
+        EventManager::instance().emit({EventType::GOAL_SCORED_LEFT});
         ball.reset();
         return;
     }
 
     if (ballBounds.position.x > windowSize.x) {
-        EventManager::instance().emit({EventType::GOAL_SCORED, "right wall"});
+        EventManager::instance().emit({EventType::GOAL_SCORED_RIGHT});
         ball.reset();
     }
 }
@@ -63,6 +63,6 @@ void CollisionHandler::handlePaddleCollision(Ball &ball, Paddle &paddle) {
         }
 
         ball.increaseSpeed();
-        EventManager::instance().emit({EventType::PADDLE_HIT, "paddle"});
+        EventManager::instance().emit({EventType::PADDLE_HIT});
     }
 }

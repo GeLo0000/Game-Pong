@@ -7,9 +7,8 @@
 enum class EventType {
     PADDLE_HIT,
     WALL_HIT,
-    GOAL_SCORED,
-    GAME_PAUSED,
-    GAME_RESUMED,
+    GOAL_SCORED_LEFT,
+    GOAL_SCORED_RIGHT,
 
     INPUT_START_PVP,
     INPUT_START_PVAI,
@@ -20,14 +19,9 @@ enum class EventType {
     INPUT_CLOSE_GAME
 };
 
-struct Event {
-    EventType type;
-    const char *info;
-};
-
 class EventManager {
   public:
-    using Callback = std::function<void(const Event &)>;
+    using Callback = std::function<void(const EventType &)>;
 
     static EventManager &instance();
 
@@ -35,7 +29,7 @@ class EventManager {
 
     void unsubscribe(EventType type, std::size_t id);
 
-    void emit(const Event &event);
+    void emit(const EventType &event);
 
   private:
     EventManager() = default;
