@@ -1,5 +1,4 @@
 #include "ScoreManager.hpp"
-#include <cstring>
 
 ScoreManager &ScoreManager::instance() {
     static ScoreManager inst;

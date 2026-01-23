@@ -14,10 +14,6 @@ UIManager::UIManager(float windowWidth, float windowHeight, ResourceManager &res
 }
 
 void UIManager::createGameUI() {
-    if (!m_font) {
-        return;
-    }
-
     m_gameCanvas = std::make_unique<UICanvas>(sf::Vector2f{0.0f, 0.0f},
                                               sf::Vector2f{m_windowWidth, m_windowHeight});
     m_gameCanvas->setBackgroundColor(sf::Color::Transparent);
@@ -41,10 +37,6 @@ void UIManager::createGameUI() {
 }
 
 void UIManager::createMenuCanvas() {
-    if (!m_font) {
-        return;
-    }
-
     m_menuCanvas = std::make_unique<UICanvas>(sf::Vector2f{0.0f, 0.0f},
                                               sf::Vector2f{m_windowWidth, m_windowHeight});
     m_menuCanvas->setBackgroundColor(sf::Color::Transparent);
@@ -85,10 +77,6 @@ void UIManager::createMenuCanvas() {
 }
 
 void UIManager::createPauseCanvas() {
-    if (!m_font) {
-        return;
-    }
-
     const float overlayX = m_windowWidth / 2.0f - kPauseOverlayWidth / 2.0f;
     const float overlayY = m_windowHeight / 2.0f - kPauseOverlayHeight / 2.0f;
 
