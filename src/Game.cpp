@@ -69,6 +69,7 @@ void Game::update(float deltaTime) {
     mode->update(deltaTime, *m_ball, *m_leftPaddle, *m_rightPaddle);
 
     m_ball->update(deltaTime);
+    m_audioManager->update();
 
     handleCollisions();
 }

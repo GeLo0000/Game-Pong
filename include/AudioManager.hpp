@@ -3,14 +3,17 @@
 #include "EventManager.hpp"
 #include "ResourceManager.hpp"
 #include <SFML/Audio.hpp>
+#include <list>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 class AudioManager {
   public:
     AudioManager(ResourceManager &resourceMgr, EventManager &eventMgr);
     ~AudioManager();
+
+    void update();
+
     bool playBackgroundMusic(const std::string &path, float volume = 20.0f);
     void pauseBackgroundMusic();
     void resumeBackgroundMusic();
@@ -31,6 +34,6 @@ class AudioManager {
     EventManager &m_eventMgr;
 
     sf::Music m_music;
-    std::unordered_map<std::string, sf::Sound> m_sounds;
+    std::list<sf::Sound> m_activeSounds;
     std::vector<std::pair<EventType, std::size_t>> m_subscriptions;
 };

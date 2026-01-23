@@ -59,6 +59,13 @@ AudioManager::~AudioManager() {
     }
 }
 
+void AudioManager::update() {
+    m_activeSounds.remove_if([](const sf::Sound &sound) {
+        return sound.getStatus() == sf::SoundSource::Status::Stopped;
+    });
+    std::cout << "Active sounds count: " << m_activeSounds.size() << "\n";
+}
+
 bool AudioManager::playBackgroundMusic(const std::string &path, float volume) {
     if (path.empty()) {
         return false;
@@ -93,14 +100,8 @@ void AudioManager::playSoundEffect(const std::string &name, float volume) {
     if (!buffer) {
         return;
     }
-    auto it = m_sounds.find(name);
-    if (it == m_sounds.end()) {
-        auto [iter, inserted] = m_sounds.try_emplace(name, *buffer);
-        iter->second.setVolume(volume);
-        iter->second.play();
-    } else {
-        it->second.setBuffer(*buffer);
-        it->second.setVolume(volume);
-        it->second.play();
-    }
+    m_activeSounds.emplace_back(*buffer);
+    auto &sound = m_activeSounds.back();
+    sound.setVolume(volume);
+    sound.play();
 }
