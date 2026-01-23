@@ -8,9 +8,9 @@ ScoreManager &ScoreManager::instance() {
 
 ScoreManager::ScoreManager() : m_leftScore(0), m_rightScore(0) {
     m_subscriptionIdLeft = EventManager::instance().subscribe(
-        EventType::GOAL_SCORED_LEFT, [this](const EventType &e) { addLeftScore(); });
+        EventType::GOAL_SCORED_LEFT, [this](const EventType &e) { addRightScore(); });
     m_subscriptionIdRight = EventManager::instance().subscribe(
-        EventType::GOAL_SCORED_RIGHT, [this](const EventType &e) { addRightScore(); });
+        EventType::GOAL_SCORED_RIGHT, [this](const EventType &e) { addLeftScore(); });
 }
 
 int ScoreManager::getLeftScore() const { return m_leftScore; }
