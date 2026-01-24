@@ -10,12 +10,12 @@ Game::Game()
     : m_window(sf::VideoMode({static_cast<unsigned int>(kWindowWidth),
                               static_cast<unsigned int>(kWindowHeight)}),
                kWindowTitle),
+      m_eventManager(EventManager::instance()),
       m_currentState(GameState::MENU) {
     m_window.setFramerateLimit(kFramerateLimit);
 
     createGameObjects();
     initializeComponents();
-    subscribeToEvents();
 }
 
 Game::~Game() = default;
@@ -34,11 +34,11 @@ void Game::createGameObjects() {
 
 void Game::initializeComponents() {
     m_audioManager =
-        std::make_unique<AudioManager>(ResourceManager::instance(), EventManager::instance());
+        std::make_unique<AudioManager>(ResourceManager::instance(), m_eventManager);
     m_uiManager =
         std::make_unique<UIManager>(kWindowWidth, kWindowHeight, ResourceManager::instance());
     m_inputHandler = std::make_unique<InputHandler>();
-    m_collisionHandler = std::make_unique<CollisionHandler>(EventManager::instance());
+    m_collisionHandler = std::make_unique<CollisionHandler>(m_eventManager);
 }
 
 void Game::run() {
@@ -55,8 +55,53 @@ void Game::processEvents() {
         if (ev->is<sf::Event::Closed>()) {
             m_window.close();
         } else if (const auto *kp = ev->getIf<sf::Event::KeyPressed>()) {
-            m_inputHandler->handleKeyPress(*kp, m_currentState, EventManager::instance());
+            GameAction action = m_inputHandler->getActionFromKey(*kp);
+            handleAction(action);
         }
+    }
+}
+
+void Game::handleAction(GameAction action) {
+    switch (action) {
+    case GameAction::Quit:
+        onCloseGame();
+        break;
+        
+    case GameAction::StartPvP:
+        if (m_currentState == GameState::MENU) {
+            onStartPvP();
+        }
+        break;
+        
+    case GameAction::StartPvAI:
+        if (m_currentState == GameState::MENU) {
+            onStartPvAI();
+        }
+        break;
+        
+    case GameAction::PauseToggle:
+        if (m_currentState == GameState::PLAYING) {
+            onPause();
+        } else if (m_currentState == GameState::PAUSED) {
+            onResume();
+        }
+        break;
+        
+    case GameAction::Restart:
+        if (m_currentState == GameState::PLAYING || m_currentState == GameState::PAUSED) {
+            onRestart();
+        }
+        break;
+        
+    case GameAction::BackToMenu:
+        if (m_currentState == GameState::PLAYING || m_currentState == GameState::PAUSED) {
+            onBackToMenu();
+        }
+        break;
+        
+    case GameAction::None:
+    default:
+        break;
     }
 }
 
@@ -107,24 +152,12 @@ void Game::handleCollisions() {
                                          {kWindowWidth, kWindowHeight});
 }
 
-void Game::subscribeToEvents() {
-    auto &eventMgr = EventManager::instance();
-
-    eventMgr.subscribe(EventType::INPUT_START_PVP, [this](const EventType &) { onStartPvP(); });
-    eventMgr.subscribe(EventType::INPUT_START_PVAI, [this](const EventType &) { onStartPvAI(); });
-    eventMgr.subscribe(EventType::INPUT_PAUSE, [this](const EventType &) { onPause(); });
-    eventMgr.subscribe(EventType::INPUT_RESUME, [this](const EventType &) { onResume(); });
-    eventMgr.subscribe(EventType::INPUT_RESTART, [this](const EventType &) { onRestart(); });
-    eventMgr.subscribe(EventType::INPUT_BACK_TO_MENU,
-                       [this](const EventType &) { onBackToMenu(); });
-    eventMgr.subscribe(EventType::INPUT_CLOSE_GAME, [this](const EventType &) { onCloseGame(); });
-}
-
 void Game::onStartPvP() {
     GameModeManager::instance().selectMode(ModeType::PvP);
     ScoreManager::instance().reset();
     m_ball->reset();
     m_currentState = GameState::PLAYING;
+    m_eventManager.emit(EventType::GAME_START);
 }
 
 void Game::onStartPvAI() {
@@ -132,22 +165,31 @@ void Game::onStartPvAI() {
     ScoreManager::instance().reset();
     m_ball->reset();
     m_currentState = GameState::PLAYING;
+    m_eventManager.emit(EventType::GAME_START);
 }
 
-void Game::onPause() { m_currentState = GameState::PAUSED; }
+void Game::onPause() { 
+    m_currentState = GameState::PAUSED; 
+    m_eventManager.emit(EventType::GAME_PAUSE); 
+}
 
-void Game::onResume() { m_currentState = GameState::PLAYING; }
+void Game::onResume() { 
+    m_currentState = GameState::PLAYING; 
+    m_eventManager.emit(EventType::GAME_RESUME); 
+}
 
 void Game::onRestart() {
     ScoreManager::instance().reset();
     m_ball->reset();
     m_currentState = GameState::PLAYING;
+    m_eventManager.emit(EventType::GAME_RESUME);
 }
 
 void Game::onBackToMenu() {
     ScoreManager::instance().reset();
     m_ball->reset();
     m_currentState = GameState::MENU;
+    m_eventManager.emit(EventType::GAME_PAUSE);
 }
 
 void Game::onCloseGame() { m_window.close(); }

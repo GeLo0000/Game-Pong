@@ -10,13 +10,9 @@ enum class EventType {
     GOAL_SCORED_LEFT,
     GOAL_SCORED_RIGHT,
 
-    INPUT_START_PVP,
-    INPUT_START_PVAI,
-    INPUT_PAUSE,
-    INPUT_RESUME,
-    INPUT_RESTART,
-    INPUT_BACK_TO_MENU,
-    INPUT_CLOSE_GAME
+    GAME_START,
+    GAME_PAUSE,
+    GAME_RESUME
 };
 
 class EventManager {

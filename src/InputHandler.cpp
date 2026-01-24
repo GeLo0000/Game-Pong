@@ -1,36 +1,20 @@
 #include "InputHandler.hpp"
 
-#include "Game.hpp"
+InputHandler::InputHandler() {
+    m_keyBindings[sf::Keyboard::Scancode::Escape] = GameAction::Quit;
+    m_keyBindings[sf::Keyboard::Scancode::Space] = GameAction::PauseToggle;
+    m_keyBindings[sf::Keyboard::Scancode::R] = GameAction::Restart;
+    m_keyBindings[sf::Keyboard::Scancode::M] = GameAction::BackToMenu;
+    m_keyBindings[sf::Keyboard::Scancode::Num1] = GameAction::StartPvP;
+    m_keyBindings[sf::Keyboard::Scancode::Numpad1] = GameAction::StartPvP;
+    m_keyBindings[sf::Keyboard::Scancode::Num2] = GameAction::StartPvAI;
+    m_keyBindings[sf::Keyboard::Scancode::Numpad2] = GameAction::StartPvAI;
+}
 
-void InputHandler::handleKeyPress(const sf::Event::KeyPressed &key, GameState currentState,
-                                  EventManager &eventMgr) {
-    if (key.scancode == sf::Keyboard::Scancode::Escape) {
-        eventMgr.emit({EventType::INPUT_CLOSE_GAME});
-        return;
+GameAction InputHandler::getActionFromKey(const sf::Event::KeyPressed &keyEvent) const {
+    auto it = m_keyBindings.find(keyEvent.scancode);
+    if (it != m_keyBindings.end()) {
+        return it->second;
     }
-
-    if (currentState == GameState::MENU) {
-        if (key.scancode == sf::Keyboard::Scancode::Num1 ||
-            key.scancode == sf::Keyboard::Scancode::Numpad1) {
-            eventMgr.emit({EventType::INPUT_START_PVP});
-        } else if (key.scancode == sf::Keyboard::Scancode::Num2 ||
-                   key.scancode == sf::Keyboard::Scancode::Numpad2) {
-            eventMgr.emit({EventType::INPUT_START_PVAI});
-        }
-        return;
-    }
-
-    if (currentState == GameState::PLAYING || currentState == GameState::PAUSED) {
-        if (key.scancode == sf::Keyboard::Scancode::Space) {
-            if (currentState == GameState::PLAYING) {
-                eventMgr.emit({EventType::INPUT_PAUSE});
-            } else if (currentState == GameState::PAUSED) {
-                eventMgr.emit({EventType::INPUT_RESUME});
-            }
-        } else if (key.scancode == sf::Keyboard::Scancode::R) {
-            eventMgr.emit({EventType::INPUT_RESTART});
-        } else if (key.scancode == sf::Keyboard::Scancode::M) {
-            eventMgr.emit({EventType::INPUT_BACK_TO_MENU});
-        }
-    }
+    return GameAction::None;
 }

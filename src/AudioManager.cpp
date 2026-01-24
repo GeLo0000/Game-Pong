@@ -24,33 +24,20 @@ AudioManager::AudioManager(ResourceManager &resourceMgr, EventManager &eventMgr)
         {EventType::GOAL_SCORED_RIGHT,
          m_eventMgr.subscribe(EventType::GOAL_SCORED_RIGHT,
                               [this](const EventType &e) { playSoundEffect(kSoundGoalName); })});
+    m_subscriptions.push_back(
+        {EventType::GAME_PAUSE,
+         m_eventMgr.subscribe(EventType::GAME_PAUSE,
+                              [this](const EventType &e) { pauseBackgroundMusic(); })});
+    m_subscriptions.push_back(
+        {EventType::GAME_RESUME,
+         m_eventMgr.subscribe(EventType::GAME_RESUME,
+                              [this](const EventType &e) { resumeBackgroundMusic(); })});
+    m_subscriptions.push_back(
+        {EventType::GAME_START,
+         m_eventMgr.subscribe(EventType::GAME_START, [this](const EventType &e) {
+             playBackgroundMusic(kAudioBackgroundPath);
+         })});
 
-    m_subscriptions.push_back(
-        {EventType::INPUT_PAUSE,
-         m_eventMgr.subscribe(EventType::INPUT_PAUSE,
-                              [this](const EventType &e) { pauseBackgroundMusic(); })});
-    m_subscriptions.push_back(
-        {EventType::INPUT_BACK_TO_MENU,
-         m_eventMgr.subscribe(EventType::INPUT_BACK_TO_MENU,
-                              [this](const EventType &e) { pauseBackgroundMusic(); })});
-    m_subscriptions.push_back(
-        {EventType::INPUT_RESUME,
-         m_eventMgr.subscribe(EventType::INPUT_RESUME,
-                              [this](const EventType &e) { resumeBackgroundMusic(); })});
-    m_subscriptions.push_back(
-        {EventType::INPUT_RESTART,
-         m_eventMgr.subscribe(EventType::INPUT_RESTART,
-                              [this](const EventType &e) { resumeBackgroundMusic(); })});
-    m_subscriptions.push_back(
-        {EventType::INPUT_START_PVP,
-         m_eventMgr.subscribe(EventType::INPUT_START_PVP, [this](const EventType &e) {
-             playBackgroundMusic(kAudioBackgroundPath);
-         })});
-    m_subscriptions.push_back(
-        {EventType::INPUT_START_PVAI,
-         m_eventMgr.subscribe(EventType::INPUT_START_PVAI, [this](const EventType &e) {
-             playBackgroundMusic(kAudioBackgroundPath);
-         })});
 }
 
 AudioManager::~AudioManager() {
@@ -63,7 +50,6 @@ void AudioManager::update() {
     m_activeSounds.remove_if([](const sf::Sound &sound) {
         return sound.getStatus() == sf::SoundSource::Status::Stopped;
     });
-    std::cout << "Active sounds count: " << m_activeSounds.size() << "\n";
 }
 
 bool AudioManager::playBackgroundMusic(const std::string &path, float volume) {

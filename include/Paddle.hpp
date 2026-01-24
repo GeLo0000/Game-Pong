@@ -3,7 +3,6 @@
 #include "IGameObject.hpp"
 #include <SFML/Graphics.hpp>
 
-// Player paddle
 class Paddle : public IGameObject {
   public:
     Paddle(float x, float y, float width, float height, float windowHeight, bool isAI = false);

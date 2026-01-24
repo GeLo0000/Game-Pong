@@ -22,10 +22,10 @@ class Game {
     void update(float deltaTime);
     void render();
     void handleCollisions();
+    void handleAction(GameAction action);
 
     void createGameObjects();
     void initializeComponents();
-    void subscribeToEvents();
 
     void onStartPvP();
     void onStartPvAI();
@@ -56,6 +56,7 @@ class Game {
     std::unique_ptr<Paddle> m_rightPaddle;
     std::unique_ptr<Ball> m_ball;
 
+    EventManager& m_eventManager;
     std::unique_ptr<AudioManager> m_audioManager;
     std::unique_ptr<UIManager> m_uiManager;
     std::unique_ptr<InputHandler> m_inputHandler;

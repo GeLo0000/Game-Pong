@@ -1,15 +1,25 @@
 #pragma once
 
-#include "EventManager.hpp"
 #include <SFML/Window/Event.hpp>
+#include <map>
 
-enum class GameState;
+enum class GameAction {
+    None,
+    Quit,
+    StartPvP,
+    StartPvAI,
+    PauseToggle,
+    Restart,
+    BackToMenu
+};
 
 class InputHandler {
   public:
-    InputHandler() = default;
+    InputHandler();
     ~InputHandler() = default;
 
-    void handleKeyPress(const sf::Event::KeyPressed &key, GameState currentState,
-                        EventManager &eventMgr);
+    GameAction getActionFromKey(const sf::Event::KeyPressed &keyEvent) const;
+
+  private:
+    std::map<sf::Keyboard::Scancode, GameAction> m_keyBindings;
 };
