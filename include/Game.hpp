@@ -10,6 +10,7 @@
 #include <memory>
 
 enum class GameState { MENU, PLAYING, PAUSED };
+enum class GameType { NONE, PvP, PvAI };
 
 class Game {
   public:
@@ -24,11 +25,11 @@ class Game {
     void handleCollisions();
     void handleAction(GameAction action);
 
-    void createGameObjects();
+    void createGameObjects(GameType type);
     void initializeComponents();
+    void resetGame();
 
-    void onStartPvP();
-    void onStartPvAI();
+    void onStart(GameType type);
     void onPause();
     void onResume();
     void onRestart();
@@ -56,11 +57,12 @@ class Game {
     std::unique_ptr<Paddle> m_rightPaddle;
     std::unique_ptr<Ball> m_ball;
 
-    EventManager& m_eventManager;
+    EventManager &m_eventManager;
     std::unique_ptr<AudioManager> m_audioManager;
     std::unique_ptr<UIManager> m_uiManager;
     std::unique_ptr<InputHandler> m_inputHandler;
     std::unique_ptr<CollisionHandler> m_collisionHandler;
 
     GameState m_currentState;
+    GameType m_currentType;
 };

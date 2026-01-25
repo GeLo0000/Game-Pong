@@ -7,10 +7,10 @@ set(SOURCES
     src/main.cpp
     src/Game.cpp
     src/Paddle.cpp
+    src/AIPaddle.cpp
     src/Ball.cpp
     src/EventManager.cpp
     src/ScoreManager.cpp
-    src/GameMode.cpp
     src/ResourceManager.cpp
     src/AudioManager.cpp
     src/GameObjectFactory.cpp
@@ -26,10 +26,10 @@ set(HEADERS
     include/Game.hpp
     include/IGameObject.hpp
     include/Paddle.hpp
+    include/AIPaddle.hpp
     include/Ball.hpp
     include/EventManager.hpp
     include/ScoreManager.hpp
-    include/GameMode.hpp
     include/ResourceManager.hpp
     include/AudioManager.hpp
     include/GameObjectFactory.hpp

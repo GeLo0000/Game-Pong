@@ -1,6 +1,6 @@
 #include "Game.hpp"
+#include "AIPaddle.hpp"
 #include "EventManager.hpp"
-#include "GameMode.hpp"
 #include "GameObjectFactory.hpp"
 #include "ResourceManager.hpp"
 #include "ScoreManager.hpp"
@@ -10,35 +10,46 @@ Game::Game()
     : m_window(sf::VideoMode({static_cast<unsigned int>(kWindowWidth),
                               static_cast<unsigned int>(kWindowHeight)}),
                kWindowTitle),
-      m_eventManager(EventManager::instance()),
-      m_currentState(GameState::MENU) {
+      m_eventManager(EventManager::instance()), m_currentState(GameState::MENU),
+      m_currentType(GameType::NONE) {
     m_window.setFramerateLimit(kFramerateLimit);
 
-    createGameObjects();
     initializeComponents();
 }
 
 Game::~Game() = default;
 
-void Game::createGameObjects() {
+void Game::createGameObjects(GameType type) {
+    m_ball = GameObjectFactory::createBall(kWindowWidth / 2.0f, kWindowHeight / 2.0f, kBallRadius,
+                                           kWindowWidth, kWindowHeight);
+
     m_leftPaddle = GameObjectFactory::createPaddle(kPaddleLeftX, kWindowHeight / 2.0f, kPaddleWidth,
                                                    kPaddleHeight, kWindowHeight);
 
-    m_rightPaddle = GameObjectFactory::createPaddle(
-        kWindowWidth - kPaddleRightXOffset - kPaddleWidth, kWindowHeight / 2.0f, kPaddleWidth,
-        kPaddleHeight, kWindowHeight, true);
-
-    m_ball = GameObjectFactory::createBall(kWindowWidth / 2.0f, kWindowHeight / 2.0f, kBallRadius,
-                                           kWindowWidth, kWindowHeight);
+    if (type == GameType::PvAI) {
+        m_rightPaddle = GameObjectFactory::createAIPaddle(
+            kWindowWidth - kPaddleRightXOffset - kPaddleWidth, kWindowHeight / 2.0f, kPaddleWidth,
+            kPaddleHeight, kWindowHeight, *m_ball);
+    } else {
+        m_rightPaddle = GameObjectFactory::createPaddle(
+            kWindowWidth - kPaddleRightXOffset - kPaddleWidth, kWindowHeight / 2.0f, kPaddleWidth,
+            kPaddleHeight, kWindowHeight);
+    }
 }
 
 void Game::initializeComponents() {
-    m_audioManager =
-        std::make_unique<AudioManager>(ResourceManager::instance(), m_eventManager);
+    m_audioManager = std::make_unique<AudioManager>(ResourceManager::instance(), m_eventManager);
     m_uiManager =
         std::make_unique<UIManager>(kWindowWidth, kWindowHeight, ResourceManager::instance());
     m_inputHandler = std::make_unique<InputHandler>();
     m_collisionHandler = std::make_unique<CollisionHandler>(m_eventManager);
+}
+
+void Game::resetGame() {
+    m_leftPaddle.reset();
+    m_rightPaddle.reset();
+    m_ball.reset();
+    ScoreManager::instance().reset();
 }
 
 void Game::run() {
@@ -66,19 +77,19 @@ void Game::handleAction(GameAction action) {
     case GameAction::Quit:
         onCloseGame();
         break;
-        
+
     case GameAction::StartPvP:
         if (m_currentState == GameState::MENU) {
-            onStartPvP();
+            onStart(GameType::PvP);
         }
         break;
-        
+
     case GameAction::StartPvAI:
         if (m_currentState == GameState::MENU) {
-            onStartPvAI();
+            onStart(GameType::PvAI);
         }
         break;
-        
+
     case GameAction::PauseToggle:
         if (m_currentState == GameState::PLAYING) {
             onPause();
@@ -86,19 +97,19 @@ void Game::handleAction(GameAction action) {
             onResume();
         }
         break;
-        
+
     case GameAction::Restart:
         if (m_currentState == GameState::PLAYING || m_currentState == GameState::PAUSED) {
             onRestart();
         }
         break;
-        
+
     case GameAction::BackToMenu:
         if (m_currentState == GameState::PLAYING || m_currentState == GameState::PAUSED) {
             onBackToMenu();
         }
         break;
-        
+
     case GameAction::None:
     default:
         break;
@@ -110,8 +121,22 @@ void Game::update(float deltaTime) {
         return;
     }
 
-    auto *mode = GameModeManager::instance().currentMode();
-    mode->update(deltaTime, *m_ball, *m_leftPaddle, *m_rightPaddle);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W)) {
+        m_leftPaddle->moveUp();
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S)) {
+        m_leftPaddle->moveDown();
+    }
+
+    if (m_currentType == GameType::PvP) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up)) {
+            m_rightPaddle->moveUp();
+        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down)) {
+            m_rightPaddle->moveDown();
+        }
+    }
+
+    m_leftPaddle->update(deltaTime);
+    m_rightPaddle->update(deltaTime);
 
     m_ball->update(deltaTime);
     m_audioManager->update();
@@ -152,42 +177,34 @@ void Game::handleCollisions() {
                                          {kWindowWidth, kWindowHeight});
 }
 
-void Game::onStartPvP() {
-    GameModeManager::instance().selectMode(ModeType::PvP);
-    ScoreManager::instance().reset();
-    m_ball->reset();
+void Game::onStart(GameType type) {
+    resetGame();
+    createGameObjects(type);
+    m_currentType = type;
     m_currentState = GameState::PLAYING;
     m_eventManager.emit(EventType::GAME_START);
 }
 
-void Game::onStartPvAI() {
-    GameModeManager::instance().selectMode(ModeType::PvAI);
-    ScoreManager::instance().reset();
-    m_ball->reset();
+void Game::onPause() {
+    m_currentState = GameState::PAUSED;
+    m_eventManager.emit(EventType::GAME_PAUSE);
+}
+
+void Game::onResume() {
     m_currentState = GameState::PLAYING;
-    m_eventManager.emit(EventType::GAME_START);
-}
-
-void Game::onPause() { 
-    m_currentState = GameState::PAUSED; 
-    m_eventManager.emit(EventType::GAME_PAUSE); 
-}
-
-void Game::onResume() { 
-    m_currentState = GameState::PLAYING; 
-    m_eventManager.emit(EventType::GAME_RESUME); 
+    m_eventManager.emit(EventType::GAME_RESUME);
 }
 
 void Game::onRestart() {
-    ScoreManager::instance().reset();
     m_ball->reset();
+    ScoreManager::instance().reset();
     m_currentState = GameState::PLAYING;
     m_eventManager.emit(EventType::GAME_RESUME);
 }
 
 void Game::onBackToMenu() {
-    ScoreManager::instance().reset();
-    m_ball->reset();
+    resetGame();
+    m_currentType = GameType::NONE;
     m_currentState = GameState::MENU;
     m_eventManager.emit(EventType::GAME_PAUSE);
 }
