@@ -8,6 +8,11 @@ ScoreManager::ScoreManager(EventManager &eventMgr)
                                                  [this](const EventType &e) { addLeftScore(); });
 }
 
+ScoreManager::~ScoreManager() {
+    m_eventMgr.unsubscribe(EventType::GOAL_SCORED_LEFT, m_subscriptionIdLeft);
+    m_eventMgr.unsubscribe(EventType::GOAL_SCORED_RIGHT, m_subscriptionIdRight);
+}
+
 int ScoreManager::getLeftScore() const { return m_leftScore; }
 
 int ScoreManager::getRightScore() const { return m_rightScore; }
