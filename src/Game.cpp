@@ -117,16 +117,16 @@ void Game::update(float deltaTime) {
         return;
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W)) {
+    if (m_inputHandler->isActionActive(GameAction::MoveLeftPaddleUp)) {
         m_leftPaddle->moveUp();
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S)) {
+    } else if (m_inputHandler->isActionActive(GameAction::MoveLeftPaddleDown)) {
         m_leftPaddle->moveDown();
     }
 
     if (m_currentType == GameType::PvP) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up)) {
+        if (m_inputHandler->isActionActive(GameAction::MoveRightPaddleUp)) {
             m_rightPaddle->moveUp();
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down)) {
+        } else if (m_inputHandler->isActionActive(GameAction::MoveRightPaddleDown)) {
             m_rightPaddle->moveDown();
         }
     }

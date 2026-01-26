@@ -2,6 +2,7 @@
 
 #include <SFML/Window/Event.hpp>
 #include <map>
+#include <vector>
 
 enum class GameAction {
     None,
@@ -10,7 +11,11 @@ enum class GameAction {
     StartPvAI,
     PauseToggle,
     Restart,
-    BackToMenu
+    BackToMenu,
+    MoveLeftPaddleUp,
+    MoveLeftPaddleDown,
+    MoveRightPaddleUp,
+    MoveRightPaddleDown
 };
 
 class InputHandler {
@@ -19,7 +24,9 @@ class InputHandler {
     ~InputHandler() = default;
 
     GameAction getActionFromKey(const sf::Event::KeyPressed &keyEvent) const;
+    bool isActionActive(GameAction action) const;
 
   private:
     std::map<sf::Keyboard::Scancode, GameAction> m_keyBindings;
+    std::map<GameAction, sf::Keyboard::Scancode> m_actionBindings;
 };
