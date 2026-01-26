@@ -2,7 +2,6 @@
 
 #include "IUIElement.hpp"
 #include <SFML/Graphics.hpp>
-#include <functional>
 #include <string>
 
 class UIButton : public IUIElement {

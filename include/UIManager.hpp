@@ -83,11 +83,9 @@ class UIManager {
 
     const sf::Font *m_font;
 
+    std::unique_ptr<UICanvas> m_menuCanvas;
+    std::unique_ptr<UICanvas> m_pauseCanvas;
     std::unique_ptr<UICanvas> m_gameCanvas;
     UILabel *m_scoreLabel;
     UILabel *m_speedLabel;
-
-    std::unique_ptr<UICanvas> m_menuCanvas;
-
-    std::unique_ptr<UICanvas> m_pauseCanvas;
 };

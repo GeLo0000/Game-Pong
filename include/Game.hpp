@@ -3,8 +3,11 @@
 #include "AudioManager.hpp"
 #include "Ball.hpp"
 #include "CollisionHandler.hpp"
+#include "EventManager.hpp"
 #include "InputHandler.hpp"
 #include "Paddle.hpp"
+#include "ResourceManager.hpp"
+#include "ScoreManager.hpp"
 #include "UIManager.hpp"
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -25,7 +28,7 @@ class Game {
     void handleCollisions();
     void handleAction(GameAction action);
 
-    void createGameObjects(GameType type);
+    void createGameObjects();
     void initializeComponents();
     void resetGame();
 
@@ -58,8 +61,10 @@ class Game {
     std::unique_ptr<Ball> m_ball;
 
     EventManager &m_eventManager;
+    ResourceManager &m_resourceManager;
     std::unique_ptr<AudioManager> m_audioManager;
     std::unique_ptr<UIManager> m_uiManager;
+    std::unique_ptr<ScoreManager> m_scoreManager;
     std::unique_ptr<InputHandler> m_inputHandler;
     std::unique_ptr<CollisionHandler> m_collisionHandler;
 

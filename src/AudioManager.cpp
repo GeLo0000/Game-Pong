@@ -37,7 +37,6 @@ AudioManager::AudioManager(ResourceManager &resourceMgr, EventManager &eventMgr)
          m_eventMgr.subscribe(EventType::GAME_START, [this](const EventType &e) {
              playBackgroundMusic(kAudioBackgroundPath);
          })});
-
 }
 
 AudioManager::~AudioManager() {

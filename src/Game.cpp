@@ -1,17 +1,13 @@
 #include "Game.hpp"
 #include "AIPaddle.hpp"
-#include "EventManager.hpp"
 #include "GameObjectFactory.hpp"
-#include "ResourceManager.hpp"
-#include "ScoreManager.hpp"
-#include <string>
 
 Game::Game()
     : m_window(sf::VideoMode({static_cast<unsigned int>(kWindowWidth),
                               static_cast<unsigned int>(kWindowHeight)}),
                kWindowTitle),
-      m_eventManager(EventManager::instance()), m_currentState(GameState::MENU),
-      m_currentType(GameType::NONE) {
+      m_eventManager(EventManager::instance()), m_resourceManager(ResourceManager::instance()),
+      m_currentState(GameState::MENU), m_currentType(GameType::NONE) {
     m_window.setFramerateLimit(kFramerateLimit);
 
     initializeComponents();
@@ -19,14 +15,14 @@ Game::Game()
 
 Game::~Game() = default;
 
-void Game::createGameObjects(GameType type) {
+void Game::createGameObjects() {
     m_ball = GameObjectFactory::createBall(kWindowWidth / 2.0f, kWindowHeight / 2.0f, kBallRadius,
                                            kWindowWidth, kWindowHeight);
 
     m_leftPaddle = GameObjectFactory::createPaddle(kPaddleLeftX, kWindowHeight / 2.0f, kPaddleWidth,
                                                    kPaddleHeight, kWindowHeight);
 
-    if (type == GameType::PvAI) {
+    if (m_currentType == GameType::PvAI) {
         m_rightPaddle = GameObjectFactory::createAIPaddle(
             kWindowWidth - kPaddleRightXOffset - kPaddleWidth, kWindowHeight / 2.0f, kPaddleWidth,
             kPaddleHeight, kWindowHeight, *m_ball);
@@ -38,9 +34,9 @@ void Game::createGameObjects(GameType type) {
 }
 
 void Game::initializeComponents() {
-    m_audioManager = std::make_unique<AudioManager>(ResourceManager::instance(), m_eventManager);
-    m_uiManager =
-        std::make_unique<UIManager>(kWindowWidth, kWindowHeight, ResourceManager::instance());
+    m_audioManager = std::make_unique<AudioManager>(m_resourceManager, m_eventManager);
+    m_uiManager = std::make_unique<UIManager>(kWindowWidth, kWindowHeight, m_resourceManager);
+    m_scoreManager = std::make_unique<ScoreManager>(m_eventManager);
     m_inputHandler = std::make_unique<InputHandler>();
     m_collisionHandler = std::make_unique<CollisionHandler>(m_eventManager);
 }
@@ -49,7 +45,7 @@ void Game::resetGame() {
     m_leftPaddle.reset();
     m_rightPaddle.reset();
     m_ball.reset();
-    ScoreManager::instance().reset();
+    m_scoreManager->reset();
 }
 
 void Game::run() {
@@ -163,7 +159,7 @@ void Game::render() {
         m_ball->draw(m_window);
     }
 
-    m_uiManager->renderGameUI(m_window, *m_ball, ScoreManager::instance());
+    m_uiManager->renderGameUI(m_window, *m_ball, *m_scoreManager);
 
     if (m_currentState == GameState::PAUSED) {
         m_uiManager->renderPause(m_window);
@@ -178,9 +174,9 @@ void Game::handleCollisions() {
 }
 
 void Game::onStart(GameType type) {
-    resetGame();
-    createGameObjects(type);
     m_currentType = type;
+    resetGame();
+    createGameObjects();
     m_currentState = GameState::PLAYING;
     m_eventManager.emit(EventType::GAME_START);
 }
@@ -197,7 +193,7 @@ void Game::onResume() {
 
 void Game::onRestart() {
     m_ball->reset();
-    ScoreManager::instance().reset();
+    m_scoreManager->reset();
     m_currentState = GameState::PLAYING;
     m_eventManager.emit(EventType::GAME_RESUME);
 }

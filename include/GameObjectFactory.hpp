@@ -1,8 +1,8 @@
 #pragma once
 
+#include "AIPaddle.hpp"
 #include "Ball.hpp"
 #include "Paddle.hpp"
-#include "AIPaddle.hpp"
 #include <memory>
 
 class GameObjectFactory {
@@ -15,5 +15,5 @@ class GameObjectFactory {
                                                 float windowHeight);
 
     static std::unique_ptr<AIPaddle> createAIPaddle(float x, float y, float width, float height,
-                                                    float windowHeight, const Ball& ball);
+                                                    float windowHeight, const Ball &ball);
 };

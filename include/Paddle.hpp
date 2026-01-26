@@ -17,7 +17,6 @@ class Paddle : public IGameObject {
 
   protected:
     static constexpr float kMoveSpeed = 400.0f;
-    static constexpr float kAiDetectionThreshold = 10.0f;
 
     sf::RectangleShape m_shape;
     float m_velocityY;

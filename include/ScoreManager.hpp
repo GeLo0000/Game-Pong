@@ -4,7 +4,7 @@
 
 class ScoreManager {
   public:
-    static ScoreManager &instance();
+    ScoreManager(EventManager &eventMgr);
 
     int getLeftScore() const;
     int getRightScore() const;
@@ -14,10 +14,7 @@ class ScoreManager {
     void reset();
 
   private:
-    ScoreManager();
-    ScoreManager(const ScoreManager &) = delete;
-    ScoreManager &operator=(const ScoreManager &) = delete;
-
+    EventManager &m_eventMgr;
     int m_leftScore;
     int m_rightScore;
     std::size_t m_subscriptionIdLeft;
