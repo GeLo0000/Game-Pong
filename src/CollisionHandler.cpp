@@ -4,13 +4,17 @@ CollisionHandler::CollisionHandler(EventManager &eventMgr) : m_eventMgr(eventMgr
 
 void CollisionHandler::handleCollisions(Ball &ball, Paddle &leftPaddle, Paddle &rightPaddle,
                                         const sf::Vector2f &windowSize) {
-    handleWallCollision(ball, windowSize);
-    handleGoal(ball, windowSize);
-    handlePaddleCollision(ball, leftPaddle);
-    handlePaddleCollision(ball, rightPaddle);
+    if (handleWallCollision(ball, windowSize))
+        return;
+    if (handleGoal(ball, windowSize))
+        return;
+    if (handlePaddleCollision(ball, leftPaddle))
+        return;
+    if (handlePaddleCollision(ball, rightPaddle))
+        return;
 }
 
-void CollisionHandler::handleWallCollision(Ball &ball, const sf::Vector2f &windowSize) {
+bool CollisionHandler::handleWallCollision(Ball &ball, const sf::Vector2f &windowSize) {
     auto ballBounds = ball.getBounds();
     const auto velocity = ball.getVelocity();
 
@@ -19,30 +23,33 @@ void CollisionHandler::handleWallCollision(Ball &ball, const sf::Vector2f &windo
         ball.setPosition(ballBounds.position);
         ball.setVelocity(velocity.x, -velocity.y);
         m_eventMgr.emit({EventType::WALL_HIT});
+        return true;
     } else if (ballBounds.position.y + ballBounds.size.y > windowSize.y) {
         ballBounds.position.y = windowSize.y - ballBounds.size.y;
         ball.setPosition(ballBounds.position);
         ball.setVelocity(velocity.x, -velocity.y);
         m_eventMgr.emit({EventType::WALL_HIT});
+        return true;
     }
+    return false;
 }
 
-void CollisionHandler::handleGoal(Ball &ball, const sf::Vector2f &windowSize) {
+bool CollisionHandler::handleGoal(Ball &ball, const sf::Vector2f &windowSize) {
     auto ballBounds = ball.getBounds();
 
     if (ballBounds.position.x + ballBounds.size.x < 0.0f) {
         m_eventMgr.emit({EventType::GOAL_SCORED_LEFT});
         ball.reset();
-        return;
-    }
-
-    if (ballBounds.position.x > windowSize.x) {
+        return true;
+    } else if (ballBounds.position.x > windowSize.x) {
         m_eventMgr.emit({EventType::GOAL_SCORED_RIGHT});
         ball.reset();
+        return true;
     }
+    return false;
 }
 
-void CollisionHandler::handlePaddleCollision(Ball &ball, Paddle &paddle) {
+bool CollisionHandler::handlePaddleCollision(Ball &ball, Paddle &paddle) {
     auto ballBounds = ball.getBounds();
     const auto velocity = ball.getVelocity();
     const auto paddleBounds = paddle.getBounds();
@@ -62,5 +69,7 @@ void CollisionHandler::handlePaddleCollision(Ball &ball, Paddle &paddle) {
 
         ball.increaseSpeed();
         m_eventMgr.emit({EventType::PADDLE_HIT});
+        return true;
     }
+    return false;
 }

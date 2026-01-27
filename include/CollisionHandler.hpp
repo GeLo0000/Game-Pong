@@ -14,9 +14,9 @@ class CollisionHandler {
                           const sf::Vector2f &windowSize);
 
   private:
-    void handleWallCollision(Ball &ball, const sf::Vector2f &windowSize);
-    void handlePaddleCollision(Ball &ball, Paddle &paddle);
-    void handleGoal(Ball &ball, const sf::Vector2f &windowSize);
+    bool handleWallCollision(Ball &ball, const sf::Vector2f &windowSize);
+    bool handlePaddleCollision(Ball &ball, Paddle &paddle);
+    bool handleGoal(Ball &ball, const sf::Vector2f &windowSize);
 
     EventManager &m_eventMgr;
 };
