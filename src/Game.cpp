@@ -6,14 +6,11 @@ Game::Game()
     : m_window(sf::VideoMode({static_cast<unsigned int>(kWindowWidth),
                               static_cast<unsigned int>(kWindowHeight)}),
                kWindowTitle),
-      m_eventManager(EventManager::instance()), m_resourceManager(ResourceManager::instance()),
-      m_currentState(GameState::MENU), m_currentType(GameType::NONE) {
+      m_eventManager(EventManager::instance()), m_resourceManager(ResourceManager::instance()) {
     m_window.setFramerateLimit(kFramerateLimit);
 
     initializeComponents();
 }
-
-Game::~Game() = default;
 
 void Game::createGameObjects() {
     m_ball = GameObjectFactory::createBall(kWindowWidth / 2.0f, kWindowHeight / 2.0f, kBallRadius,

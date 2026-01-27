@@ -18,7 +18,6 @@ enum class GameType { NONE, PvP, PvAI };
 class Game {
   public:
     Game();
-    ~Game();
     void run();
 
   private:
@@ -68,6 +67,6 @@ class Game {
     std::unique_ptr<InputHandler> m_inputHandler;
     std::unique_ptr<CollisionHandler> m_collisionHandler;
 
-    GameState m_currentState;
-    GameType m_currentType;
+    GameState m_currentState = GameState::MENU;
+    GameType m_currentType = GameType::NONE;
 };

@@ -33,5 +33,5 @@ class EventManager {
     EventManager &operator=(const EventManager &) = delete;
 
     std::unordered_map<EventType, std::vector<std::pair<std::size_t, Callback>>> m_listeners;
-    std::size_t m_nextId{1};
+    std::size_t m_nextId = 1;
 };

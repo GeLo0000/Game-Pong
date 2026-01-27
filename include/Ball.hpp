@@ -27,6 +27,6 @@ class Ball : public IGameObject {
     static constexpr float kPi = 3.14159f;
 
     sf::CircleShape m_shape;
-    float m_windowWidth;
-    float m_windowHeight;
+    float m_windowWidth = 800.0f;
+    float m_windowHeight = 600.0f;
 };

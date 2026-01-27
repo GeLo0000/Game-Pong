@@ -3,8 +3,7 @@
 #include <string>
 
 UIManager::UIManager(float windowWidth, float windowHeight, ResourceManager &resourceMgr)
-    : m_windowWidth(windowWidth), m_windowHeight(windowHeight), m_resourceMgr(resourceMgr),
-      m_font(nullptr), m_scoreLabel(nullptr), m_speedLabel(nullptr) {
+    : m_windowWidth(windowWidth), m_windowHeight(windowHeight), m_resourceMgr(resourceMgr) {
     m_resourceMgr.loadFont(kFontMainName, kFontMainPath);
     m_font = m_resourceMgr.getFont(kFontMainName);
 

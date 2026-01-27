@@ -1,7 +1,6 @@
 #include "ScoreManager.hpp"
 
-ScoreManager::ScoreManager(EventManager &eventMgr)
-    : m_leftScore(0), m_rightScore(0), m_eventMgr(eventMgr) {
+ScoreManager::ScoreManager(EventManager &eventMgr) : m_eventMgr(eventMgr) {
     m_subscriptionIdLeft = m_eventMgr.subscribe(EventType::GOAL_SCORED_LEFT,
                                                 [this](const EventType &e) { addRightScore(); });
     m_subscriptionIdRight = m_eventMgr.subscribe(EventType::GOAL_SCORED_RIGHT,

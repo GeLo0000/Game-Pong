@@ -8,7 +8,6 @@
 class CollisionHandler {
   public:
     CollisionHandler(EventManager &eventMgr);
-    ~CollisionHandler() = default;
 
     void handleCollisions(Ball &ball, Paddle &leftPaddle, Paddle &rightPaddle,
                           const sf::Vector2f &windowSize);

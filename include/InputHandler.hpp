@@ -21,7 +21,6 @@ enum class GameAction {
 class InputHandler {
   public:
     InputHandler();
-    ~InputHandler() = default;
 
     GameAction getActionFromKey(const sf::Event::KeyPressed &keyEvent) const;
     bool isActionActive(GameAction action) const;

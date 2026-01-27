@@ -1,6 +1,6 @@
 #include "UICanvas.hpp"
 
-UICanvas::UICanvas(const sf::Vector2f &position, const sf::Vector2f &size) : m_visible(true) {
+UICanvas::UICanvas(const sf::Vector2f &position, const sf::Vector2f &size) {
     m_background.setPosition(position);
     m_background.setSize(size);
     m_background.setFillColor(sf::Color::Transparent);

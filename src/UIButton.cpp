@@ -2,7 +2,7 @@
 
 UIButton::UIButton(const sf::Vector2f &position, const sf::Vector2f &size, const std::string &text,
                    const sf::Font &font)
-    : m_text(font), m_isHovered(false), m_normalColor(sf::Color::Transparent),
+    : m_text(font), m_normalColor(sf::Color::Transparent),
       m_hoverColor(sf::Color(kHoverBgGrey, kHoverBgGrey, kHoverBgGrey, kHoverBgAlpha)),
       m_outlineColor(sf::Color::White) {
 

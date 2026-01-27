@@ -32,5 +32,5 @@ class UICanvas {
   private:
     sf::RectangleShape m_background;
     std::vector<std::unique_ptr<IUIElement>> m_elements;
-    bool m_visible;
+    bool m_visible = true;
 };

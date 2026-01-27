@@ -16,8 +16,8 @@ class ScoreManager {
 
   private:
     EventManager &m_eventMgr;
-    int m_leftScore;
-    int m_rightScore;
-    std::size_t m_subscriptionIdLeft{};
-    std::size_t m_subscriptionIdRight{};
+    int m_leftScore = 0;
+    int m_rightScore = 0;
+    std::size_t m_subscriptionIdLeft = 0;
+    std::size_t m_subscriptionIdRight = 0;
 };

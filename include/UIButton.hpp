@@ -37,7 +37,7 @@ class UIButton : public IUIElement {
 
     sf::RectangleShape m_background;
     sf::Text m_text;
-    bool m_isHovered;
+    bool m_isHovered = false;
 
     sf::Color m_normalColor;
     sf::Color m_hoverColor;

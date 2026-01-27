@@ -76,16 +76,16 @@ class UIManager {
     static constexpr int kPauseButtonBgGrey = 50;
     static constexpr int kGreyColor = 150;
 
-    float m_windowWidth;
-    float m_windowHeight;
+    float m_windowWidth = 800.0f;
+    float m_windowHeight = 600.0f;
 
     ResourceManager &m_resourceMgr;
 
-    const sf::Font *m_font;
+    const sf::Font *m_font = nullptr;
 
     std::unique_ptr<UICanvas> m_menuCanvas;
     std::unique_ptr<UICanvas> m_pauseCanvas;
     std::unique_ptr<UICanvas> m_gameCanvas;
-    UILabel *m_scoreLabel;
-    UILabel *m_speedLabel;
+    UILabel *m_scoreLabel = nullptr;
+    UILabel *m_speedLabel = nullptr;
 };

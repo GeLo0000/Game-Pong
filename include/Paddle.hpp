@@ -19,7 +19,7 @@ class Paddle : public IGameObject {
     static constexpr float kMoveSpeed = 400.0f;
 
     sf::RectangleShape m_shape;
-    float m_windowHeight;
+    float m_windowHeight = 600.0f;
 
   private:
 };
