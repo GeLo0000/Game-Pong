@@ -14,7 +14,7 @@ class Ball : public IGameObject {
     void reset();
     void setVelocity(float vx, float vy);
     sf::Vector2f getVelocity() const;
-    void setPosition(sf::Vector2f position);
+    void setPosition(sf::Vector2f position) override;
     void increaseSpeed();
 
   private:
@@ -27,7 +27,6 @@ class Ball : public IGameObject {
     static constexpr float kPi = 3.14159f;
 
     sf::CircleShape m_shape;
-    sf::Vector2f m_velocity;
     float m_windowWidth;
     float m_windowHeight;
 };

@@ -13,13 +13,12 @@ class Paddle : public IGameObject {
 
     void moveUp();
     void moveDown();
-    void setPosition(sf::Vector2f position);
+    void setPosition(sf::Vector2f position) override;
 
   protected:
     static constexpr float kMoveSpeed = 400.0f;
 
     sf::RectangleShape m_shape;
-    float m_velocityY;
     float m_windowHeight;
 
   private:
