@@ -1,56 +1,50 @@
 #include "Game.hpp"
-#include "AudioManager.hpp"
-#include "EventManager.hpp"
-#include "GameMode.hpp"
+#include "AIPaddle.hpp"
 #include "GameObjectFactory.hpp"
-#include "ResourceManager.hpp"
-#include "ScoreManager.hpp"
-#include <iostream>
-#include <string>
 
-// Initialize game window and components
 Game::Game()
-    : m_windowWidth(800.0f), m_windowHeight(600.0f),
-      m_window(sf::VideoMode({static_cast<unsigned int>(m_windowWidth),
-                              static_cast<unsigned int>(m_windowHeight)}),
-               "Pong Game"),
-      m_currentState(GameState::MENU) {
-    m_window.setFramerateLimit(144);
+    : m_window(sf::VideoMode({static_cast<unsigned int>(kWindowWidth),
+                              static_cast<unsigned int>(kWindowHeight)}),
+               kWindowTitle),
+      m_eventManager(EventManager::instance()), m_resourceManager(ResourceManager::instance()) {
+    m_window.setFramerateLimit(kFramerateLimit);
 
-    createGameObjects();
     initializeComponents();
 }
 
-Game::~Game() = default;
-
-// Create game objects using factory
 void Game::createGameObjects() {
-    auto &factory = GameObjectFactory::instance();
-    const float paddleWidth = 15.0f;
-    const float paddleHeight = 100.0f;
+    m_ball = GameObjectFactory::createBall(kWindowWidth / 2.0f, kWindowHeight / 2.0f, kBallRadius,
+                                           kWindowWidth, kWindowHeight);
 
-    m_leftPaddle = factory.createPaddle(50.0f, m_windowHeight / 2.0f, paddleWidth, paddleHeight,
-                                        m_windowHeight);
+    m_leftPaddle = GameObjectFactory::createPaddle(kPaddleLeftX, kWindowHeight / 2.0f, kPaddleWidth,
+                                                   kPaddleHeight, kWindowHeight);
 
-    m_rightPaddle = factory.createPaddle(m_windowWidth - 50.0f - paddleWidth, m_windowHeight / 2.0f,
-                                         paddleWidth, paddleHeight, m_windowHeight, true);
-
-    const float ballRadius = 10.0f;
-    m_ball = factory.createBall(m_windowWidth / 2.0f, m_windowHeight / 2.0f, ballRadius,
-                                m_windowWidth, m_windowHeight);
+    if (m_currentType == GameType::PvAI) {
+        m_rightPaddle = GameObjectFactory::createAIPaddle(
+            kWindowWidth - kPaddleRightXOffset - kPaddleWidth, kWindowHeight / 2.0f, kPaddleWidth,
+            kPaddleHeight, kWindowHeight, *m_ball);
+    } else {
+        m_rightPaddle = GameObjectFactory::createPaddle(
+            kWindowWidth - kPaddleRightXOffset - kPaddleWidth, kWindowHeight / 2.0f, kPaddleWidth,
+            kPaddleHeight, kWindowHeight);
+    }
 }
 
-// Initialize component managers
 void Game::initializeComponents() {
-    ResourceManager::instance().loadFont("main_font", "assets/fonts/Roboto-Regular.ttf");
-    AudioManager::instance();
-    m_uiManager = std::make_unique<UIManager>(m_windowWidth, m_windowHeight);
-    m_uiManager->loadFont(ResourceManager::instance().getFont("main_font"));
+    m_audioManager = std::make_unique<AudioManager>(m_resourceManager, m_eventManager);
+    m_uiManager = std::make_unique<UIManager>(kWindowWidth, kWindowHeight, m_resourceManager);
+    m_scoreManager = std::make_unique<ScoreManager>(m_eventManager);
     m_inputHandler = std::make_unique<InputHandler>();
-    m_collisionHandler = std::make_unique<CollisionHandler>();
+    m_collisionHandler = std::make_unique<CollisionHandler>(m_eventManager);
 }
 
-// Main game loop
+void Game::resetGame() {
+    m_leftPaddle.reset();
+    m_rightPaddle.reset();
+    m_ball.reset();
+    m_scoreManager->reset();
+}
+
 void Game::run() {
     while (m_window.isOpen()) {
         float dt = m_clock.restart().asSeconds();
@@ -60,60 +54,98 @@ void Game::run() {
     }
 }
 
-// Handle window events
 void Game::processEvents() {
     while (const std::optional ev = m_window.pollEvent()) {
         if (ev->is<sf::Event::Closed>()) {
             m_window.close();
         } else if (const auto *kp = ev->getIf<sf::Event::KeyPressed>()) {
-            // Global close key
-            if (m_inputHandler->handleCloseGameKey(*kp)) {
-                m_window.close();
-            }
-            // Menu input handling
-            if (m_currentState == GameState::MENU) {
-                if (m_inputHandler->handleMenuInput(*kp, *m_ball)) {
-                    m_currentState = GameState::PLAYING;
-                    AudioManager::instance().playBackgroundMusic("assets/audio/background.ogg");
-                }
-                continue;
-            }
-            // Gameplay input handling (pause/resume, restart, menu)
-            if (m_currentState == GameState::PAUSED || m_currentState == GameState::PLAYING) {
-                m_inputHandler->handleGameplayKeyPress(*kp, m_currentState, *m_ball);
-            }
+            GameAction action = m_inputHandler->getActionFromKey(*kp);
+            handleAction(action);
         }
     }
 }
 
-// Update game logic
+void Game::handleAction(GameAction action) {
+    switch (action) {
+    case GameAction::Quit:
+        onCloseGame();
+        break;
+
+    case GameAction::StartPvP:
+        if (m_currentState == GameState::MENU) {
+            onStart(GameType::PvP);
+        }
+        break;
+
+    case GameAction::StartPvAI:
+        if (m_currentState == GameState::MENU) {
+            onStart(GameType::PvAI);
+        }
+        break;
+
+    case GameAction::PauseToggle:
+        if (m_currentState == GameState::PLAYING) {
+            onPause();
+        } else if (m_currentState == GameState::PAUSED) {
+            onResume();
+        }
+        break;
+
+    case GameAction::Restart:
+        if (m_currentState == GameState::PLAYING || m_currentState == GameState::PAUSED) {
+            onRestart();
+        }
+        break;
+
+    case GameAction::BackToMenu:
+        if (m_currentState == GameState::PLAYING || m_currentState == GameState::PAUSED) {
+            onBackToMenu();
+        }
+        break;
+
+    case GameAction::None:
+    default:
+        break;
+    }
+}
+
 void Game::update(float deltaTime) {
-    // Skip updates while paused or in menu
     if (m_currentState == GameState::PAUSED || m_currentState == GameState::MENU) {
         return;
     }
 
-    // Delegate paddle control to the active game mode
-    auto *mode = GameModeManager::instance().currentMode();
-    mode->update(deltaTime, *m_ball, *m_leftPaddle, *m_rightPaddle);
+    if (m_inputHandler->isActionActive(GameAction::MoveLeftPaddleUp)) {
+        m_leftPaddle->moveUp();
+    } else if (m_inputHandler->isActionActive(GameAction::MoveLeftPaddleDown)) {
+        m_leftPaddle->moveDown();
+    }
+
+    if (m_currentType == GameType::PvP) {
+        if (m_inputHandler->isActionActive(GameAction::MoveRightPaddleUp)) {
+            m_rightPaddle->moveUp();
+        } else if (m_inputHandler->isActionActive(GameAction::MoveRightPaddleDown)) {
+            m_rightPaddle->moveDown();
+        }
+    }
+
+    m_leftPaddle->update(deltaTime);
+    m_rightPaddle->update(deltaTime);
 
     m_ball->update(deltaTime);
+    m_audioManager->update();
 
     handleCollisions();
 }
 
-// Render all game objects
 void Game::render() {
     m_window.clear(sf::Color::Black);
 
-    // Menu screen
     if (m_currentState == GameState::MENU) {
         m_uiManager->renderMenu(m_window);
         m_window.display();
         return;
     }
 
-    // Draw game objects
     if (m_leftPaddle) {
         m_leftPaddle->draw(m_window);
     }
@@ -124,8 +156,7 @@ void Game::render() {
         m_ball->draw(m_window);
     }
 
-    // Render score and pause overlay
-    m_uiManager->renderGameUI(m_window, m_ball->getVelocity());
+    m_uiManager->renderGameUI(m_window, *m_ball, *m_scoreManager);
 
     if (m_currentState == GameState::PAUSED) {
         m_uiManager->renderPause(m_window);
@@ -134,8 +165,41 @@ void Game::render() {
     m_window.display();
 }
 
-// Collision handling: paddles, walls, goals
 void Game::handleCollisions() {
     m_collisionHandler->handleCollisions(*m_ball, *m_leftPaddle, *m_rightPaddle,
-                                         {m_windowWidth, m_windowHeight});
+                                         {kWindowWidth, kWindowHeight});
 }
+
+void Game::onStart(GameType type) {
+    m_currentType = type;
+    resetGame();
+    createGameObjects();
+    m_currentState = GameState::PLAYING;
+    m_eventManager.emit(EventType::GAME_START);
+}
+
+void Game::onPause() {
+    m_currentState = GameState::PAUSED;
+    m_eventManager.emit(EventType::GAME_PAUSE);
+}
+
+void Game::onResume() {
+    m_currentState = GameState::PLAYING;
+    m_eventManager.emit(EventType::GAME_RESUME);
+}
+
+void Game::onRestart() {
+    m_ball->reset();
+    m_scoreManager->reset();
+    m_currentState = GameState::PLAYING;
+    m_eventManager.emit(EventType::GAME_RESUME);
+}
+
+void Game::onBackToMenu() {
+    resetGame();
+    m_currentType = GameType::NONE;
+    m_currentState = GameState::MENU;
+    m_eventManager.emit(EventType::GAME_PAUSE);
+}
+
+void Game::onCloseGame() { m_window.close(); }

@@ -2,10 +2,10 @@
 
 #include "EventManager.hpp"
 
-// Singleton score tracker that listens to GOAL_SCORED events
 class ScoreManager {
   public:
-    static ScoreManager &instance();
+    ScoreManager(EventManager &eventMgr);
+    ~ScoreManager();
 
     int getLeftScore() const;
     int getRightScore() const;
@@ -15,13 +15,9 @@ class ScoreManager {
     void reset();
 
   private:
-    ScoreManager();
-    ScoreManager(const ScoreManager &) = delete;
-    ScoreManager &operator=(const ScoreManager &) = delete;
-
-    void onGoalScored(const Event &event);
-
-    int m_leftScore;
-    int m_rightScore;
-    std::size_t m_subscriptionId;
+    EventManager &m_eventMgr;
+    int m_leftScore = 0;
+    int m_rightScore = 0;
+    std::size_t m_subscriptionIdLeft = 0;
+    std::size_t m_subscriptionIdRight = 0;
 };

@@ -1,26 +1,31 @@
 #pragma once
 
-#include "Ball.hpp"
-#include "EventManager.hpp"
-#include "GameMode.hpp"
-#include "Paddle.hpp"
-#include "ScoreManager.hpp"
 #include <SFML/Window/Event.hpp>
+#include <map>
+#include <vector>
 
-enum class GameState;
+enum class GameAction {
+    None,
+    Quit,
+    StartPvP,
+    StartPvAI,
+    PauseToggle,
+    Restart,
+    BackToMenu,
+    MoveLeftPaddleUp,
+    MoveLeftPaddleDown,
+    MoveRightPaddleUp,
+    MoveRightPaddleDown
+};
 
-// Handles keyboard input and menu interactions
 class InputHandler {
   public:
-    InputHandler() = default;
-    ~InputHandler() = default;
+    InputHandler();
 
-    // Process key press events; returns true if should close window
-    bool handleCloseGameKey(const sf::Event::KeyPressed &key);
+    GameAction getActionFromKey(const sf::Event::KeyPressed &keyEvent) const;
+    bool isActionActive(GameAction action) const;
 
-    // Process menu input; returns true if game should start
-    bool handleMenuInput(const sf::Event::KeyPressed &key, Ball &ball);
-
-    // Process gameplay-specific key presses (pause, restart, menu)
-    bool handleGameplayKeyPress(const sf::Event::KeyPressed &key, GameState &state, Ball &ball);
+  private:
+    std::map<sf::Keyboard::Scancode, GameAction> m_keyBindings;
+    std::map<GameAction, sf::Keyboard::Scancode> m_actionBindings;
 };

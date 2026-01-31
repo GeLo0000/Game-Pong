@@ -19,8 +19,8 @@ void EventManager::unsubscribe(EventType type, std::size_t id) {
               vec.end());
 }
 
-void EventManager::emit(const Event &event) {
-    auto it = m_listeners.find(event.type);
+void EventManager::emit(const EventType &event) {
+    auto it = m_listeners.find(event);
     if (it == m_listeners.end()) {
         return;
     }

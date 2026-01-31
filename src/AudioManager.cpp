@@ -1,50 +1,60 @@
 #include "AudioManager.hpp"
-
 #include <iostream>
 
-AudioManager &AudioManager::instance() {
-    static AudioManager inst;
-    return inst;
-}
+AudioManager::AudioManager(ResourceManager &resourceMgr, EventManager &eventMgr)
+    : m_resourceMgr(resourceMgr), m_eventMgr(eventMgr) {
+    resourceMgr.loadSoundBuffer(kSoundPaddleHitName, kAudioPaddleHitPath);
+    resourceMgr.loadSoundBuffer(kSoundWallHitName, kAudioWallHitPath);
+    resourceMgr.loadSoundBuffer(kSoundGoalName, kAudioGoalPath);
 
-AudioManager::AudioManager() {
-    // Preload all sound buffers to avoid first-play delay
-    auto &rm = ResourceManager::instance();
-    rm.loadSoundBuffer("paddle_hit", "assets/audio/paddle_hit.ogg");
-    rm.loadSoundBuffer("wall_hit", "assets/audio/wall_hit.ogg");
-    rm.loadSoundBuffer("goal", "assets/audio/goal.ogg");
-
-    // Subscribe to events we need
-    auto &em = EventManager::instance();
     m_subscriptions.push_back(
         {EventType::PADDLE_HIT,
-         em.subscribe(EventType::PADDLE_HIT, [this](const Event &e) { onEvent(e); })});
+         m_eventMgr.subscribe(EventType::PADDLE_HIT, [this](const EventType &e) {
+             playSoundEffect(kSoundPaddleHitName);
+         })});
     m_subscriptions.push_back(
-        {EventType::WALL_HIT,
-         em.subscribe(EventType::WALL_HIT, [this](const Event &e) { onEvent(e); })});
+        {EventType::WALL_HIT, m_eventMgr.subscribe(EventType::WALL_HIT, [this](const EventType &e) {
+             playSoundEffect(kSoundWallHitName);
+         })});
     m_subscriptions.push_back(
-        {EventType::GOAL_SCORED,
-         em.subscribe(EventType::GOAL_SCORED, [this](const Event &e) { onEvent(e); })});
+        {EventType::GOAL_SCORED_LEFT,
+         m_eventMgr.subscribe(EventType::GOAL_SCORED_LEFT,
+                              [this](const EventType &e) { playSoundEffect(kSoundGoalName); })});
     m_subscriptions.push_back(
-        {EventType::GAME_PAUSED,
-         em.subscribe(EventType::GAME_PAUSED, [this](const Event &e) { onEvent(e); })});
+        {EventType::GOAL_SCORED_RIGHT,
+         m_eventMgr.subscribe(EventType::GOAL_SCORED_RIGHT,
+                              [this](const EventType &e) { playSoundEffect(kSoundGoalName); })});
     m_subscriptions.push_back(
-        {EventType::GAME_RESUMED,
-         em.subscribe(EventType::GAME_RESUMED, [this](const Event &e) { onEvent(e); })});
+        {EventType::GAME_PAUSE,
+         m_eventMgr.subscribe(EventType::GAME_PAUSE,
+                              [this](const EventType &e) { pauseBackgroundMusic(); })});
+    m_subscriptions.push_back(
+        {EventType::GAME_RESUME,
+         m_eventMgr.subscribe(EventType::GAME_RESUME,
+                              [this](const EventType &e) { resumeBackgroundMusic(); })});
+    m_subscriptions.push_back(
+        {EventType::GAME_START,
+         m_eventMgr.subscribe(EventType::GAME_START, [this](const EventType &e) {
+             playBackgroundMusic(kAudioBackgroundPath);
+         })});
 }
 
 AudioManager::~AudioManager() {
-    auto &em = EventManager::instance();
     for (const auto &[type, id] : m_subscriptions) {
-        em.unsubscribe(type, id);
+        m_eventMgr.unsubscribe(type, id);
     }
+}
+
+void AudioManager::update() {
+    m_activeSounds.remove_if([](const sf::Sound &sound) {
+        return sound.getStatus() == sf::SoundSource::Status::Stopped;
+    });
 }
 
 bool AudioManager::playBackgroundMusic(const std::string &path, float volume) {
     if (path.empty()) {
         return false;
     }
-    // Don't restart if already playing
     if (m_music.getStatus() == sf::SoundSource::Status::Playing) {
         return true;
     }
@@ -71,39 +81,12 @@ void AudioManager::resumeBackgroundMusic() {
 }
 
 void AudioManager::playSoundEffect(const std::string &name, float volume) {
-    const auto *buffer = ResourceManager::instance().getSoundBuffer(name);
+    const auto *buffer = m_resourceMgr.getSoundBuffer(name);
     if (!buffer) {
-        return; // Not loaded
+        return;
     }
-    auto it = m_sounds.find(name);
-    if (it == m_sounds.end()) {
-        // Create sound in map first, then play
-        auto [iter, inserted] = m_sounds.try_emplace(name, *buffer);
-        iter->second.setVolume(volume);
-        iter->second.play();
-    } else {
-        it->second.setBuffer(*buffer);
-        it->second.setVolume(volume);
-        it->second.play();
-    }
-}
-
-void AudioManager::onEvent(const Event &event) {
-    switch (event.type) {
-    case EventType::PADDLE_HIT:
-        playSoundEffect("paddle_hit");
-        break;
-    case EventType::WALL_HIT:
-        playSoundEffect("wall_hit");
-        break;
-    case EventType::GOAL_SCORED:
-        playSoundEffect("goal");
-        break;
-    case EventType::GAME_PAUSED:
-        pauseBackgroundMusic();
-        break;
-    case EventType::GAME_RESUMED:
-        resumeBackgroundMusic();
-        break;
-    }
+    m_activeSounds.emplace_back(*buffer);
+    auto &sound = m_activeSounds.back();
+    sound.setVolume(volume);
+    sound.play();
 }
