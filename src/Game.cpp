@@ -60,6 +60,15 @@ void Game::processEvents() {
         } else if (const auto *kp = ev->getIf<sf::Event::KeyPressed>()) {
             GameAction action = m_inputHandler->getActionFromKey(*kp);
             handleAction(action);
+        } else if (const auto *mm = ev->getIf<sf::Event::MouseMoved>()) {
+            sf::Vector2f mousePos = m_window.mapPixelToCoords(mm->position);
+            m_uiManager->handleMouseMove(mousePos, m_currentState);
+        } else if (const auto *mb = ev->getIf<sf::Event::MouseButtonPressed>()) {
+            if (mb->button == sf::Mouse::Button::Left) {
+                sf::Vector2f mousePos = m_window.mapPixelToCoords(mb->position);
+                GameAction action = m_uiManager->handleMouseClick(mousePos, m_currentState);
+                handleAction(action);
+            }
         }
     }
 }

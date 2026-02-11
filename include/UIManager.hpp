@@ -1,13 +1,17 @@
 #pragma once
 
 #include "Ball.hpp"
+#include "InputHandler.hpp"
 #include "ResourceManager.hpp"
 #include "ScoreManager.hpp"
 #include "UIButton.hpp"
 #include "UICanvas.hpp"
 #include "UILabel.hpp"
 #include <SFML/Graphics.hpp>
+#include <map>
 #include <memory>
+
+enum class GameState;
 
 class UIManager {
   public:
@@ -16,6 +20,9 @@ class UIManager {
     void renderMenu(sf::RenderWindow &window);
     void renderGameUI(sf::RenderWindow &window, const Ball &ball, ScoreManager &scoreManager);
     void renderPause(sf::RenderWindow &window);
+
+    void handleMouseMove(const sf::Vector2f &pos, GameState state);
+    GameAction handleMouseClick(const sf::Vector2f &pos, GameState state);
 
   private:
     void createGameUI();
@@ -88,4 +95,7 @@ class UIManager {
     std::unique_ptr<UICanvas> m_gameCanvas;
     UILabel *m_scoreLabel = nullptr;
     UILabel *m_speedLabel = nullptr;
+
+    std::map<UIButton *, GameAction> m_menuActions;
+    std::map<UIButton *, GameAction> m_pauseActions;
 };

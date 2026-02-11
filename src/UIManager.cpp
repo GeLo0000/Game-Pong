@@ -1,4 +1,5 @@
 #include "UIManager.hpp"
+#include "Game.hpp"
 #include <cmath>
 #include <string>
 
@@ -39,6 +40,7 @@ void UIManager::createMenuCanvas() {
     m_menuCanvas = std::make_unique<UICanvas>(sf::Vector2f{0.0f, 0.0f},
                                               sf::Vector2f{m_windowWidth, m_windowHeight});
     m_menuCanvas->setBackgroundColor(sf::Color::Transparent);
+    m_menuActions.clear();
 
     auto titleLabel = std::make_unique<UILabel>(
         sf::Vector2f{m_windowWidth / 2.0f - kTitleLabelOffsetX, kTitleLabelY}, kMenuTitleText,
@@ -59,20 +61,24 @@ void UIManager::createMenuCanvas() {
     auto pvpButton = std::make_unique<UIButton>(
         sf::Vector2f{centerX - kButtonWidth - kButtonSpacing / 2.0f, startY},
         sf::Vector2f{kButtonWidth, kButtonHeight}, kMenuButtonPvPText, *m_font);
+    UIButton *pvpButtonPtr = pvpButton.get();
     pvpButton->setTextSize(kButtonTextSize);
     pvpButton->setBackgroundColor(sf::Color::Transparent);
     pvpButton->setOutlineColor(sf::Color::White);
     pvpButton->setOutlineThickness(kButtonOutlineThickness);
     m_menuCanvas->addElement(std::move(pvpButton));
+    m_menuActions[pvpButtonPtr] = GameAction::StartPvP;
 
     auto pvaiButton = std::make_unique<UIButton>(
         sf::Vector2f{centerX + kButtonSpacing / 2.0f, startY},
         sf::Vector2f{kButtonWidth, kButtonHeight}, kMenuButtonPvAIText, *m_font);
+    UIButton *pvaiButtonPtr = pvaiButton.get();
     pvaiButton->setTextSize(kButtonTextSize);
     pvaiButton->setBackgroundColor(sf::Color::Transparent);
     pvaiButton->setOutlineColor(sf::Color::White);
     pvaiButton->setOutlineThickness(kButtonOutlineThickness);
     m_menuCanvas->addElement(std::move(pvaiButton));
+    m_menuActions[pvaiButtonPtr] = GameAction::StartPvAI;
 }
 
 void UIManager::createPauseCanvas() {
@@ -85,6 +91,7 @@ void UIManager::createPauseCanvas() {
         sf::Color(kPauseCanvasBgGrey, kPauseCanvasBgGrey, kPauseCanvasBgGrey));
     m_pauseCanvas->setOutlineColor(sf::Color::Black);
     m_pauseCanvas->setOutlineThickness(kButtonOutlineThickness);
+    m_pauseActions.clear();
 
     auto pauseTitle = std::make_unique<UILabel>(
         sf::Vector2f{m_windowWidth / 2.0f - kPauseTitleOffsetX, overlayY + kPauseTitleYOffset},
@@ -96,19 +103,24 @@ void UIManager::createPauseCanvas() {
     const float btnStartX = overlayX + kPausePadding;
     const float btnY = overlayY + kPauseOverlayHeight - kPauseButtonHeight - kPausePadding;
 
-    std::vector<std::string> buttonLabels = {kPauseButtonContinueText, kPauseButtonRestartText,
-                                             kPauseButtonMenuText, kPauseButtonExitText};
+    std::vector<std::pair<std::string, GameAction>> buttonDefs = {
+        {kPauseButtonContinueText, GameAction::PauseToggle},
+        {kPauseButtonRestartText, GameAction::Restart},
+        {kPauseButtonMenuText, GameAction::BackToMenu},
+        {kPauseButtonExitText, GameAction::Quit}};
 
-    for (size_t i = 0; i < buttonLabels.size(); ++i) {
+    for (size_t i = 0; i < buttonDefs.size(); ++i) {
         auto btn = std::make_unique<UIButton>(
             sf::Vector2f{btnStartX + i * (kPauseButtonWidth + kPauseButtonSpacing), btnY},
-            sf::Vector2f{kPauseButtonWidth, kPauseButtonHeight}, buttonLabels[i], *m_font);
+            sf::Vector2f{kPauseButtonWidth, kPauseButtonHeight}, buttonDefs[i].first, *m_font);
+        UIButton *btnPtr = btn.get();
         btn->setTextSize(kPauseButtonTextSize);
         btn->setBackgroundColor(
             sf::Color(kPauseButtonBgGrey, kPauseButtonBgGrey, kPauseButtonBgGrey));
         btn->setOutlineColor(sf::Color::Black);
         btn->setOutlineThickness(2.0f);
         m_pauseCanvas->addElement(std::move(btn));
+        m_pauseActions[btnPtr] = buttonDefs[i].second;
     }
 }
 void UIManager::renderMenu(sf::RenderWindow &window) {
@@ -142,4 +154,39 @@ void UIManager::renderPause(sf::RenderWindow &window) {
     if (m_pauseCanvas) {
         m_pauseCanvas->draw(window);
     }
+}
+
+void UIManager::handleMouseMove(const sf::Vector2f &pos, GameState state) {
+    auto *actions = (state == GameState::MENU)     ? &m_menuActions
+                    : (state == GameState::PAUSED) ? &m_pauseActions
+                                                   : nullptr;
+
+    if (!actions) {
+        return;
+    }
+
+    for (const auto &entry : *actions) {
+        if (entry.first) {
+            entry.first->setHovered(entry.first->contains(pos));
+        }
+    }
+}
+
+GameAction UIManager::handleMouseClick(const sf::Vector2f &pos, GameState state) {
+    auto *actions = (state == GameState::MENU)     ? &m_menuActions
+                    : (state == GameState::PAUSED) ? &m_pauseActions
+                                                   : nullptr;
+
+    if (!actions) {
+        return GameAction::None;
+    }
+
+    for (const auto &entry : *actions) {
+        if (entry.first && entry.first->contains(pos)) {
+            entry.first->setHovered(false);
+            return entry.second;
+        }
+    }
+
+    return GameAction::None;
 }
