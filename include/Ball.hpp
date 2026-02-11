@@ -5,7 +5,7 @@
 
 class Ball : public IGameObject {
   public:
-    Ball(float x, float y, float radius, float windowWidth, float windowHeight);
+    Ball(float radius, float windowWidth, float windowHeight);
 
     void update(float deltaTime) override;
     void draw(sf::RenderTarget &target) override;
@@ -18,8 +18,6 @@ class Ball : public IGameObject {
     void increaseSpeed();
 
   private:
-    static constexpr float kInitialVelocityX = 200.0f;
-    static constexpr float kInitialVelocityY = 150.0f;
     static constexpr float kSpeedMultiplier = 1.05f;
     static constexpr float kMaxSpeed = 2000.0f;
     static constexpr float kBaseSpeed = 300.0f;

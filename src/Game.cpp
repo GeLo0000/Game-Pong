@@ -13,8 +13,7 @@ Game::Game()
 }
 
 void Game::createGameObjects() {
-    m_ball = GameObjectFactory::createBall(kWindowWidth / 2.0f, kWindowHeight / 2.0f, kBallRadius,
-                                           kWindowWidth, kWindowHeight);
+    m_ball = GameObjectFactory::createBall(kBallRadius, kWindowWidth, kWindowHeight);
 
     m_leftPaddle = GameObjectFactory::createPaddle(kPaddleLeftX, kWindowHeight / 2.0f, kPaddleWidth,
                                                    kPaddleHeight, kWindowHeight);

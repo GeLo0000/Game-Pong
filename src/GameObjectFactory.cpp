@@ -1,8 +1,8 @@
 #include "GameObjectFactory.hpp"
 
-std::unique_ptr<Ball> GameObjectFactory::createBall(float x, float y, float radius,
-                                                    float windowWidth, float windowHeight) {
-    return std::make_unique<Ball>(x, y, radius, windowWidth, windowHeight);
+std::unique_ptr<Ball> GameObjectFactory::createBall(float radius, float windowWidth,
+                                                    float windowHeight) {
+    return std::make_unique<Ball>(radius, windowWidth, windowHeight);
 }
 
 std::unique_ptr<Paddle> GameObjectFactory::createPaddle(float x, float y, float width, float height,

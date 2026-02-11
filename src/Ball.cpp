@@ -3,12 +3,11 @@
 #include <cmath>
 #include <random>
 
-Ball::Ball(float x, float y, float radius, float windowWidth, float windowHeight)
+Ball::Ball(float radius, float windowWidth, float windowHeight)
     : m_windowWidth(windowWidth), m_windowHeight(windowHeight) {
-    m_velocity = {kInitialVelocityX, kInitialVelocityY};
     m_shape.setRadius(radius);
-    m_shape.setPosition({x - radius, y - radius});
     m_shape.setFillColor(sf::Color::Yellow);
+    reset();
 }
 
 void Ball::update(float deltaTime) {

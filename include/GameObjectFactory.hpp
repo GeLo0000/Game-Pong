@@ -8,8 +8,7 @@
 class GameObjectFactory {
   public:
     GameObjectFactory() = delete;
-    static std::unique_ptr<Ball> createBall(float x, float y, float radius, float windowWidth,
-                                            float windowHeight);
+    static std::unique_ptr<Ball> createBall(float radius, float windowWidth, float windowHeight);
 
     static std::unique_ptr<Paddle> createPaddle(float x, float y, float width, float height,
                                                 float windowHeight);
