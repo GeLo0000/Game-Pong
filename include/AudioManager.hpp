@@ -3,14 +3,16 @@
 #include "EventManager.hpp"
 #include "ResourceManager.hpp"
 #include <SFML/Audio.hpp>
+#include <list>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
-// Manages music and sound effects, reacting to emitted events.
 class AudioManager {
   public:
-    static AudioManager &instance();
+    AudioManager(ResourceManager &resourceMgr, EventManager &eventMgr);
+    ~AudioManager();
+
+    void update();
 
     bool playBackgroundMusic(const std::string &path, float volume = 20.0f);
     void pauseBackgroundMusic();
@@ -18,16 +20,20 @@ class AudioManager {
 
     void playSoundEffect(const std::string &name, float volume = 65.0f);
 
+    static constexpr auto kSoundPaddleHitName = "paddleHitSound";
+    static constexpr auto kSoundWallHitName = "wallHitSound";
+    static constexpr auto kSoundGoalName = "goalSound";
+
+    static constexpr auto kAudioPaddleHitPath = "assets/audio/paddle_hit.ogg";
+    static constexpr auto kAudioWallHitPath = "assets/audio/wall_hit.ogg";
+    static constexpr auto kAudioGoalPath = "assets/audio/goal.ogg";
+    static constexpr auto kAudioBackgroundPath = "assets/audio/background.ogg";
+
   private:
-    AudioManager();
-    ~AudioManager();
-
-    AudioManager(const AudioManager &) = delete;
-    AudioManager &operator=(const AudioManager &) = delete;
-
-    void onEvent(const Event &event);
+    ResourceManager &m_resourceMgr;
+    EventManager &m_eventMgr;
 
     sf::Music m_music;
-    std::unordered_map<std::string, sf::Sound> m_sounds;
+    std::list<sf::Sound> m_activeSounds;
     std::vector<std::pair<EventType, std::size_t>> m_subscriptions;
 };

@@ -1,68 +1,33 @@
 #include "InputHandler.hpp"
 
-#include "Game.hpp"
+InputHandler::InputHandler() {
+    m_keyBindings[sf::Keyboard::Scancode::Escape] = GameAction::Quit;
+    m_keyBindings[sf::Keyboard::Scancode::Space] = GameAction::PauseToggle;
+    m_keyBindings[sf::Keyboard::Scancode::R] = GameAction::Restart;
+    m_keyBindings[sf::Keyboard::Scancode::M] = GameAction::BackToMenu;
+    m_keyBindings[sf::Keyboard::Scancode::Num1] = GameAction::StartPvP;
+    m_keyBindings[sf::Keyboard::Scancode::Numpad1] = GameAction::StartPvP;
+    m_keyBindings[sf::Keyboard::Scancode::Num2] = GameAction::StartPvAI;
+    m_keyBindings[sf::Keyboard::Scancode::Numpad2] = GameAction::StartPvAI;
 
-bool InputHandler::handleCloseGameKey(const sf::Event::KeyPressed &key) {
-    // Escape key closes the game
-    if (key.scancode == sf::Keyboard::Scancode::Escape) {
-        return true;
-    }
-    return false;
+    m_actionBindings[GameAction::MoveLeftPaddleUp] = sf::Keyboard::Scancode::W;
+    m_actionBindings[GameAction::MoveLeftPaddleDown] = sf::Keyboard::Scancode::S;
+    m_actionBindings[GameAction::MoveRightPaddleUp] = sf::Keyboard::Scancode::Up;
+    m_actionBindings[GameAction::MoveRightPaddleDown] = sf::Keyboard::Scancode::Down;
 }
 
-bool InputHandler::handleMenuInput(const sf::Event::KeyPressed &key, Ball &ball) {
-    // Map keys 1 and 2 (or numpad) to modes
-    std::optional<ModeType> mode;
-
-    if (key.scancode == sf::Keyboard::Scancode::Num1 ||
-        key.scancode == sf::Keyboard::Scancode::Numpad1) {
-        mode = ModeType::PvP;
-    } else if (key.scancode == sf::Keyboard::Scancode::Num2 ||
-               key.scancode == sf::Keyboard::Scancode::Numpad2) {
-        mode = ModeType::PvAI;
+GameAction InputHandler::getActionFromKey(const sf::Event::KeyPressed &keyEvent) const {
+    auto it = m_keyBindings.find(keyEvent.scancode);
+    if (it != m_keyBindings.end()) {
+        return it->second;
     }
-
-    if (mode.has_value()) {
-        GameModeManager::instance().selectMode(mode.value());
-        ScoreManager::instance().reset();
-        ball.reset();
-        return true; // Start game
-    }
-
-    return false;
+    return GameAction::None;
 }
 
-bool InputHandler::handleGameplayKeyPress(const sf::Event::KeyPressed &key, GameState &state,
-                                          Ball &ball) {
-    // Space: toggle pause/resume
-    if (key.scancode == sf::Keyboard::Scancode::Space) {
-        if (state == GameState::PLAYING) {
-            state = GameState::PAUSED;
-            EventManager::instance().emit({EventType::GAME_PAUSED, "paused"});
-        } else if (state == GameState::PAUSED) {
-            state = GameState::PLAYING;
-            EventManager::instance().emit({EventType::GAME_RESUMED, "resumed"});
-        }
-        return false;
+bool InputHandler::isActionActive(GameAction action) const {
+    auto it = m_actionBindings.find(action);
+    if (it != m_actionBindings.end()) {
+        return sf::Keyboard::isKeyPressed(it->second);
     }
-
-    // R: restart round (reset score and ball, continue playing)
-    if (key.scancode == sf::Keyboard::Scancode::R) {
-        ScoreManager::instance().reset();
-        ball.reset();
-        state = GameState::PLAYING;
-        EventManager::instance().emit({EventType::GAME_RESUMED, "restarted"});
-        return false;
-    }
-
-    // M: back to main menu
-    if (key.scancode == sf::Keyboard::Scancode::M) {
-        ScoreManager::instance().reset();
-        ball.reset();
-        state = GameState::MENU;
-        EventManager::instance().emit({EventType::GAME_PAUSED, "menu"});
-        return false;
-    }
-
     return false;
 }

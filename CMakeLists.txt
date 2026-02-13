@@ -7,32 +7,39 @@ set(SOURCES
     src/main.cpp
     src/Game.cpp
     src/Paddle.cpp
+    src/AIPaddle.cpp
     src/Ball.cpp
     src/EventManager.cpp
     src/ScoreManager.cpp
-    src/GameMode.cpp
     src/ResourceManager.cpp
     src/AudioManager.cpp
     src/GameObjectFactory.cpp
     src/UIManager.cpp
     src/InputHandler.cpp
     src/CollisionHandler.cpp
+    src/UIButton.cpp
+    src/UILabel.cpp
+    src/UICanvas.cpp
 )
 
 set(HEADERS
     include/Game.hpp
     include/IGameObject.hpp
     include/Paddle.hpp
+    include/AIPaddle.hpp
     include/Ball.hpp
     include/EventManager.hpp
     include/ScoreManager.hpp
-    include/GameMode.hpp
     include/ResourceManager.hpp
     include/AudioManager.hpp
     include/GameObjectFactory.hpp
     include/UIManager.hpp
     include/InputHandler.hpp
     include/CollisionHandler.hpp
+    include/IUIElement.hpp
+    include/UIButton.hpp
+    include/UILabel.hpp
+    include/UICanvas.hpp
 )
 
 include(FetchContent)

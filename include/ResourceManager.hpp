@@ -5,7 +5,6 @@
 #include <string>
 #include <unordered_map>
 
-// Loads and stores reusable assets (fonts, sound buffers).
 class ResourceManager {
   public:
     static ResourceManager &instance();
