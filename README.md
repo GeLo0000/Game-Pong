@@ -2,6 +2,14 @@
 
 Implementation of the classic Pong game built with C++ and SFML 3.0.2.
 
+## Technologies
+
+- **Language:** C++ (C++17)
+- **Graphics:** SFML 3.0.2
+- **Build System:** CMake 3.28+
+- **Platform:** Windows, Linux
+- **Compiler:** GCC (g++)
+
 ## Features
 
 - **Two Game Modes:**
@@ -15,7 +23,7 @@ Implementation of the classic Pong game built with C++ and SFML 3.0.2.
   - Pause/Resume functionality
 
 - **User Interface:**
-  - Main menu for mode selection
+  - Main menu for mode selection with mouse and keyboard support
   - In-game UI showing score and ball velocity
   - Pause menu
 
@@ -30,22 +38,13 @@ Implementation of the classic Pong game built with C++ and SFML 3.0.2.
 - **Encapsulation:** Each component manages its own state
 - **Inheritance:** IGameObject base class for game entities (Paddle, Ball)
 - **Polymorphism:** Virtual methods for draw(), update(), getBounds()
-- **Abstraction:** Clear interfaces for game objects (IGameObject)
+- **Abstraction:** Clear interfaces for UI element (IUIElement)
 
 ### Design Patterns
 
-- **Singleton Pattern:** EventManager, ScoreManager, ResourceManager, AudioManager
+- **Singleton Pattern:** EventManager, ResourceManager
 - **Observer Pattern:** Event-driven architecture via EventManager
 - **Factory Pattern:** GameObjectFactory for object creation
-- **Strategy Pattern:** GameMode abstract class for different game modes (PvP, PvB)
-
-## Technologies
-
-- **Language:** C++ (C++17)
-- **Graphics:** SFML 3.0.2
-- **Build System:** CMake 3.28+
-- **Platform:** Windows, Linux
-- **Compiler:** GCC (g++)
 
 ## Installation & Setup
 
@@ -107,17 +106,17 @@ cmake --build .
 ### Controls
 
 **Main Menu:**
-- Press `1` to select Player vs Player mode
-- Press `2` to select Player vs Bot
+- Press `1` or **Click** "Player vs Player" button to select PvP mode
+- Press `2` or **Click** "Player vs Bot" button to select PvB mode
 - Press `ESC` to exit
 
 **During Gameplay:**
 - **Left Paddle:** `W` (Up) / `S` (Down)
-- **Right Paddle:** `↑` (Up) / `↓` (Down) in PvP mode, or Bot moves automatically
+- **Right Paddle:** `↑` (Up) / `↓` (Down) in PvP mode, or Bot moves automatically in PvB mode
 - **`Space`:** Pause/Resume game
 - **`R`:** Restart round
 - **`M`:** Return to main menu
 - **`ESC`:** Exit game
 
 ## Download
-- Download: [Game-Pong for Windows](https://github.com/GeLo0000/Game-Pong/releases/download/v1.0/Game-Pong.Windows.zip)
+- Download: [Game-Pong for Windows](https://github.com/GeLo0000/Game-Pong/releases/download/v1.1/Game-Pong_v1.1_Windows_x64.zip)
